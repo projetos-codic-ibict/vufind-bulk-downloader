@@ -1,0 +1,97 @@
+<?php 
+$form = $this->form;
+$form->prepare();
+$form->setAttribute('action', $this->url('bulkexport-csv') . '?total=' . $this->total);
+$form->setAttribute('method', 'post');
+
+$defFields = explode(',', $this->defFields);
+$defLabels = array();
+
+foreach ($defFields as $field){
+	array_push($defLabels, $this->transEsc($field));
+}
+
+$selFields = explode(',', $this->selFields);
+$selLabels = array();
+
+foreach ($selFields as $field){
+	array_push($selLabels, $this->transEsc($field));
+}
+
+echo $this->form()->openTag($form);
+?>
+
+<div>
+	<h2><?=$this->transEsc('export_csv')?></h2>
+</div>
+
+<div>
+	<?=$this->transEsc('export_msg') ?>
+</div>
+
+<br>
+
+<?php if ($this->optionalFields): ?>
+<div style="margin-bottom:10px" class="select">
+<?php
+	echo $this->transEsc('default_fields') . implode(', ', $defLabels) . '<br>';
+	echo $this->transEsc('select_fields') . '<br><br>';
+	$fields = $form->get('fields');
+	$fields->setValueOptions($selLabels);
+	echo $this->formSelect($fields);
+	echo $this->formElementErrors($fields);  
+?></div>
+<?php endif; ?>
+
+<div class="checkbox-inline">
+<?php
+    $primaryAbstract = $form->get('primaryAbstract');
+	echo $this->formCheckbox($primaryAbstract);
+    echo $this->formElementErrors($primaryAbstract);
+	echo $this->transEsc('include_primary_abstract');
+?></div>
+
+<br>
+
+<?php if ($this->foreignAbstract): ?>
+<div style="margin-bottom:20px" class="checkbox-inline">
+<?php
+	$foreignAbstract = $form->get('foreignAbstract');
+	echo $this->formCheckbox($foreignAbstract);
+	echo $this->formElementErrors($foreignAbstract);
+	echo $this->transEsc('include_foreign_abstract');	
+?></div>
+<?php else: ?>
+<br>
+<?php endif; ?>
+
+<?php if ($this->encodingOption): ?>
+<div style="margin-bottom:20px" class="select">
+<?php
+	$os = $form->get('os');
+	echo $this->transEsc('operating_system');
+	echo $this->formSelect($os);
+	echo $this->formElementErrors($os);	
+?></div>
+<?php endif; ?>
+
+<div style="margin-bottom:20px" class="form_element">
+<?php
+    $email = $form->get('email');
+	echo $this->transEsc('email_address');
+    echo $this->formEmail($email);
+    echo $this->formElementErrors($email);
+?></div>
+
+<div style="margin-bottom:20px" class="form_element">
+<?php
+    $captcha = $form->get('captcha');
+    echo $this->formCaptcha($captcha);
+    echo $this->formElementErrors($captcha);
+?></div>
+
+<div style="margin-bottom:20px">
+	<?=$this->formElement($form->get('send')->setValue($this->transEsc('Send')))?>	
+</div>
+
+<?=$this->form()->closeTag() ?>
