@@ -83,8 +83,8 @@ public class VufindQueryController {
 	@Value("${mail.wait-msg-top}")
 	private String waitMsgTop;
 
-	@Value("${mail.wait-mg-bottom}")
-	private String waitMsgBottom;
+	// @Value("${mail.wait-mg-bottom}")
+	// private String waitMsgBottom;
 
 	@Value("${mail.link-subject}")
 	private String linkSubject;
@@ -121,7 +121,9 @@ public class VufindQueryController {
 
 	// Build the URL for downloading the generated CSV file
 	private String buildDownloadUrl(String fileName) {
-
+		if (!port.isEmpty()) {
+			return host + ":" + port + "/query/download?fileName=" + fileName;
+		}
 		return host + "/query/download?fileName=" + fileName;
 	}
 
@@ -135,33 +137,6 @@ public class VufindQueryController {
 		fields = Stream.of(list.split(",")).collect(Collectors.toList());
 
 		return fields;
-	}
-
-	// Estimate the time for creating the CSV file
-	private String getTimeEstimate(int totalRecords, boolean hasAbstract) {
-
-		String estimate = new String();
-		Double recTime = hasAbstract ? longRecTime : shortRecTime;
-		long totalTime = (long) (totalRecords * recTime * delay);
-
-		Duration timeLeft = Duration.ofMillis(totalTime);
-		long days = timeLeft.toDays();
-		timeLeft = timeLeft.minusDays(days);
-		long hours = timeLeft.toHours();
-		timeLeft = timeLeft.minusHours(hours);
-		long minutes = timeLeft.toMinutes();
-
-		if (days > 0) {
-			estimate = days + " " + timeUnits.get("day") + ", " + hours + " " + timeUnits.get("hour") + " "
-					+ timeUnits.get("conjunction") + " " + minutes + " " + timeUnits.get("minute");
-		} else if (hours > 0) {
-			estimate = hours + " " + timeUnits.get("hour") + " " + timeUnits.get("conjunction") + " " + minutes + " "
-					+ timeUnits.get("minute");
-		} else {
-			estimate = minutes + " " + timeUnits.get("minute");
-		}
-
-		return estimate;
 	}
 
 	// Query Solr to get the data and create a CSV file from it
@@ -248,7 +223,7 @@ public class VufindQueryController {
 			// Download URL will be sent to user by email later
 
 			// First send an email acknowledging the request was received
-			String waitMsg = waitMsgTop + " " + getTimeEstimate(numRecords, includeAbstract) + " " + waitMsgBottom;
+			String waitMsg = waitMsgTop;
 			mailer.sendMail(sender, userEmail, confSubject, waitMsg);
 
 			// Create the CSV file
