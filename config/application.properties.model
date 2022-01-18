@@ -84,7 +84,7 @@ mail.ready-msg = Prezado usu\u00e1rio,<br><br>Seu arquivo CSV foi criado com \u0
 #Confirmation message sent when the export was requested but the number of records is too large, 
 #so the download link will be sent later in another email. It is split into two parts so the file   
 #creation time estimate can be inserted between them in the mail body. Some HTML is fine
-mail.wait-msg-top = Prezado usu\u00e1rio,<br><br>Sua solicita\u00e7\u00e3o de exporta\u00e7\u00e3o foi recebida e o arquivo CSV est\u00e1 sendo criado. Devido \u00e0 quantidade de registros, o arquivo dever\u00e1 levar aproximadamente
+mail.wait-msg-top = Prezado usu\u00e1rio,<br><br>Sua solicita\u00e7\u00e3o de exporta\u00e7\u00e3o foi recebida e o arquivo CSV est\u00e1 sendo criado. Devido \u00e0 quantidade de registros, o arquivo dever\u00e1 levar alguns minutos para ficar pronto. Voc\u00ea receber\u00e1 outro e-mail com o link para download quando estiver conclu\u00eddo.<br><br>Atenciosamente,<br>Equipe Oasisbr.
 mail.wait-mg-bottom = para ficar pronto. Voc\u00ea receber\u00e1 outro e-mail com o link para download quando estiver conclu\u00eddo.<br><br>Atenciosamente,<br>Equipe Oasisbr.
 #Email subject for the download link email
 mail.link-subject = Download do arquivo CSV
