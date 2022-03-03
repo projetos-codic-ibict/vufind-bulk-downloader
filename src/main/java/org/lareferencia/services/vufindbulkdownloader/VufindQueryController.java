@@ -10,7 +10,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -197,8 +196,8 @@ public class VufindQueryController {
 			@RequestParam(required = true) String hasAbstract, @RequestParam(required = true) String encoding,
 			@RequestParam(required = true) String userEmail) {
 		boolean isDownload = Boolean.parseBoolean(download);
-		boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
-		int numRecords = Integer.valueOf(totalRecords);
+		// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
+		// int numRecords = Integer.valueOf(totalRecords);
 
 		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 		String sufix = queryString + date;
