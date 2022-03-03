@@ -186,6 +186,11 @@ public class VufindQueryController {
 		}
 	}
 
+	@RequestMapping("/")
+	public String home() {
+		return "Service is online!";
+	}
+
 	@RequestMapping("/query")
 	public String executeQuery(@RequestParam(required = true) String queryString,
 			@RequestParam(required = true) String download, @RequestParam(required = true) String totalRecords,
