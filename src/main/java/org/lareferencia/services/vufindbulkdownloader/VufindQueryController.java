@@ -120,10 +120,15 @@ public class VufindQueryController {
 
 	// Build the URL for downloading the generated CSV file
 	private String buildDownloadUrl(String fileName) {
-		if (port != null && !port.isEmpty()) {
-			return host + ":" + port + "/query/download?fileName=" + fileName;
+		try {
+			if (port != null && !port.isEmpty()) {
+				return host + ":" + port + "/query/download?fileName=" + fileName;
+			}
+			return host + "/query/download?fileName=" + fileName;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
-		return host + "/query/download?fileName=" + fileName;
 	}
 
 	// Get the list of fields selected by the user for export
@@ -198,45 +203,51 @@ public class VufindQueryController {
 			@RequestParam(required = true) String download, @RequestParam(required = true) String totalRecords,
 			@RequestParam(required = true) String hasAbstract, @RequestParam(required = true) String encoding,
 			@RequestParam(required = true) String userEmail) {
-		boolean isDownload = Boolean.parseBoolean(download);
-		// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
-		// int numRecords = Integer.valueOf(totalRecords);
+		try {
 
-		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
-		String sufix = queryString + date;
-		String fileName = "search_result-" + String.valueOf(sufix.hashCode());
-		String outputFile = filePath + fileName;
-		String downloadUrl = buildDownloadUrl(fileName + ".zip");
+			boolean isDownload = Boolean.parseBoolean(download);
+			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
+			// int numRecords = Integer.valueOf(totalRecords);
 
-		Mailer mailer = new Mailer(smtpHost, smtpPort, sender, pwd);
+			String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
+			String sufix = queryString + date;
+			String fileName = "search_result-" + String.valueOf(sufix.hashCode());
+			String outputFile = filePath + fileName;
+			String downloadUrl = buildDownloadUrl(fileName + ".zip");
 
-		if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
-			// User will be able to download the file immediately
+			Mailer mailer = new Mailer(smtpHost, smtpPort, sender, pwd);
 
-			// Only creates the CSV file if a file created from the same query does not
-			// already exist
-			if (Files.notExists(Paths.get(outputFile + ".zip"))) {
+			if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
+				// User will be able to download the file immediately
+
+				// Only creates the CSV file if a file created from the same query does not
+				// already exist
+				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
+					createFile(queryString, outputFile, encoding);
+				}
+
+				// Send a confirmation email
+				mailer.sendMail(sender, userEmail, confSubject, readyMsg);
+
+				return downloadUrl;
+			} else {
+				// Download URL will be sent to user by email later
+
+				// First send an email acknowledging the request was received
+				String waitMsg = waitMsgTop;
+				mailer.sendMail(sender, userEmail, confSubject, waitMsg);
+
+				// Create the CSV file
 				createFile(queryString, outputFile, encoding);
+
+				// Send download URL by email
+				String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
+				mailer.sendMail(sender, userEmail, linkSubject, linkMsg);
+
+				return null;
 			}
-
-			// Send a confirmation email
-			mailer.sendMail(sender, userEmail, confSubject, readyMsg);
-
-			return downloadUrl;
-		} else {
-			// Download URL will be sent to user by email later
-
-			// First send an email acknowledging the request was received
-			String waitMsg = waitMsgTop;
-			mailer.sendMail(sender, userEmail, confSubject, waitMsg);
-
-			// Create the CSV file
-			createFile(queryString, outputFile, encoding);
-
-			// Send download URL by email
-			String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
-			mailer.sendMail(sender, userEmail, linkSubject, linkMsg);
-
+		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
