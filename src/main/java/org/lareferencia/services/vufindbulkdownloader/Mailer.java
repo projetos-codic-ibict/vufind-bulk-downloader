@@ -1,7 +1,8 @@
 package org.lareferencia.services.vufindbulkdownloader;
 
 import java.util.Properties;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -13,6 +14,7 @@ import javax.mail.internet.MimeMessage;
 
 public class Mailer {
 
+	Log log = LogFactory.getLog(Mailer.class);
 	private Properties properties = System.getProperties();
 	private Session session;
 
@@ -35,7 +37,7 @@ public class Mailer {
 	}
 
 	public void sendMail(String from, String to, String subject, String msg) {
-
+		this.log.info("init sendMail ");
 		try {
 			MimeMessage message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(from));
@@ -43,6 +45,7 @@ public class Mailer {
 			message.setSubject(subject, "utf-8");
 			message.setContent(msg, "text/html; charset=utf-8");
 			Transport.send(message);
+			this.log.info("email sent");
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}

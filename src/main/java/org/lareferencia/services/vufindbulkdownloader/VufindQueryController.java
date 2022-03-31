@@ -120,11 +120,15 @@ public class VufindQueryController {
 
 	// Build the URL for downloading the generated CSV file
 	private String buildDownloadUrl(String fileName) {
+		this.log.info("buildDownloadUrl to fileName: " + fileName);
 		try {
+			String fileUrl = null;
 			if (port != null && !port.isEmpty()) {
-				return host + ":" + port + "/query/download?fileName=" + fileName;
+				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
 			}
-			return host + "/query/download?fileName=" + fileName;
+			fileUrl = host + "/query/download?fileName=" + fileName;
+			this.log.info("fileURL created: " + fileUrl);
+			return fileUrl;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -204,7 +208,7 @@ public class VufindQueryController {
 			@RequestParam(required = true) String hasAbstract, @RequestParam(required = true) String encoding,
 			@RequestParam(required = true) String userEmail) {
 		try {
-
+			this.log.info("init executeQuery...");
 			boolean isDownload = Boolean.parseBoolean(download);
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
 			// int numRecords = Integer.valueOf(totalRecords);
@@ -228,11 +232,11 @@ public class VufindQueryController {
 
 				// Send a confirmation email
 				mailer.sendMail(sender, userEmail, confSubject, readyMsg);
-
+				this.log.info("downloadUrl created for direct download: " + downloadUrl);
 				return downloadUrl;
 			} else {
 				// Download URL will be sent to user by email later
-
+				this.log.info("downloadUrl will be sent to user by email later");
 				// First send an email acknowledging the request was received
 				String waitMsg = waitMsgTop;
 				mailer.sendMail(sender, userEmail, confSubject, waitMsg);
@@ -255,7 +259,7 @@ public class VufindQueryController {
 	@RequestMapping("/query/download")
 	public ResponseEntity<FileSystemResource> downloadFile(@RequestParam(required = true) String fileName)
 			throws IOException {
-
+		this.log.info("init downloadFile...");
 		File file = new File(filePath + fileName);
 		FileSystemResource resource = new FileSystemResource(file);
 
