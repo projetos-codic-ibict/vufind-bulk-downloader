@@ -123,7 +123,7 @@ public class VufindQueryController {
 		this.log.info("buildDownloadUrl to fileName: " + fileName);
 		try {
 			String fileUrl = null;
-			if (this.port.equals("0")) {
+			if (this.host.contains("oasisbr.ibict.br")) {
 				fileUrl = host + "/query/download?fileName=" + fileName;
 			} else {
 				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
