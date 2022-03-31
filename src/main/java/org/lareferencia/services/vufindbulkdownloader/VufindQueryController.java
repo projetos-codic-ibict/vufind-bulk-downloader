@@ -123,10 +123,10 @@ public class VufindQueryController {
 		this.log.info("buildDownloadUrl to fileName: " + fileName);
 		try {
 			String fileUrl = null;
-			if (this.port != null && !this.port.isEmpty()) {
-				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
-			} else {
+			if (this.port.equals("0")) {
 				fileUrl = host + "/query/download?fileName=" + fileName;
+			} else {
+				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
 			}
 			this.log.info("fileURL created: " + fileUrl);
 			return fileUrl;
