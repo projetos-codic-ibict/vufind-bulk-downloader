@@ -121,6 +121,7 @@ public class VufindQueryController {
 	// Build the URL for downloading the generated CSV file
 	private String buildDownloadUrl(String fileName) {
 		this.log.info("buildDownloadUrl to fileName: " + fileName);
+		this.log.info("host and port: " + host + port);
 		try {
 			String fileUrl = null;
 			if (port != null && !port.isEmpty()) {
