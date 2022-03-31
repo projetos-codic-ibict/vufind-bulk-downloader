@@ -124,10 +124,11 @@ public class VufindQueryController {
 		this.log.info("host and port: " + host + port);
 		try {
 			String fileUrl = null;
-			if (port != null && !port.isEmpty()) {
+			if (this.port != null && !this.port.isEmpty()) {
 				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
+			} else {
+				fileUrl = host + "/query/download?fileName=" + fileName;
 			}
-			fileUrl = host + "/query/download?fileName=" + fileName;
 			this.log.info("fileURL created: " + fileUrl);
 			return fileUrl;
 		} catch (Exception e) {
