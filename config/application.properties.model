@@ -32,29 +32,30 @@ file.header = {"dc.contributor.author.fl_str_mv":"Autor(a)", \
 				"dc.contributor.referee3Lattes.fl_str_mv":"null", \
 				"dc.contributor.referee4Lattes.fl_str_mv":"null", \
 				"dc.contributor.referee5Lattes.fl_str_mv":"null", \
-				"title":"Título", \
-				"dc.description.resumo.por.fl_txt_mv":"Resumo em Português", \
-				"dc.description.abstract.eng.fl_txt_mv":"Resumo em Inglês", \
+				"format": "Tipo de documento", \
+				"title":"T\u00edtulo", \
+				"dc.description.resumo.por.fl_txt_mv":"Resumo em Portugu\u00eas", \
+				"dc.description.abstract.eng.fl_txt_mv":"Resumo em Ingl\u00eas", \
 				"dc.date.issued.fl_str_mv":"Ano de defesa", \
-				"instname_str":"Instituição de defesa", \
-				"instacron_str":"Sigla da instituição de defesa", \
-				"dc.publisher.country.fl_str_mv":"País da instituição de defesa", \
-				"dc.geolocationplace.none.fl_str_mv":"Região da instituição de defesa", \
-				"dc.polygonPoint.none.fl_str_mv":"UF da instituição de defesa", \
-				"dc.publisher.administrative.fl_str_mv":"Natureza administrativa da instituição de defesa", \
-				"dc.pointLatitude.none.fl_str_mv":"Latitude da instituição de defesa", \
-				"dc.pointLongitude.none.fl_str_mv":"Longitude da instituição de defesa", \
-				"dc.publisherID.none.fl_str_mv":"Identificador único da instituição de defesa", \
-				"dc.publisher.department.fl_str_mv":"Departamento da instituição de defesa", \
-				"dc.publisher.program.fl_str_mv":"Programa de Pós-Graduação da instituição de defesa", \
-				"dc.publisher.programID.fl_str_mv":"Identificador único do Programa de Pós-Graduação da instituição de defesa", \
-				"dc.publisher.knowledgearea.fl_str_mv":"Área do conhecimento", \
-				"dc.publisher.areaavaliacao.fl_str_mv":"Área de avaliação", \
+				"instname_str":"Institui\u00e7\u00e3o de defesa", \
+				"instacron_str":"Sigla da institui\u00e7\u00e3o de defesa", \
+				"dc.publisher.country.fl_str_mv":"Pa\u00eds da institui\u00e7\u00e3o de defesa", \
+				"dc.geolocationplace.none.fl_str_mv":"Regi\u00e3o da institui\u00e7\u00e3o de defesa", \
+				"dc.polygonPoint.none.fl_str_mv":"UF da institui\u00e7\u00e3o de defesa", \
+				"dc.publisher.administrative.fl_str_mv":"Natureza administrativa da institui\u00e7\u00e3o de defesa", \
+				"dc.pointLatitude.none.fl_str_mv":"Latitude da institui\u00e7\u00e3o de defesa", \
+				"dc.pointLongitude.none.fl_str_mv":"Longitude da institui\u00e7\u00e3o de defesa", \
+				"dc.publisherID.none.fl_str_mv":"Identificador \u00fanico da institui\u00e7\u00e3o de defesa", \
+				"dc.publisher.department.fl_str_mv":"Departamento da institui\u00e7\u00e3o de defesa", \
+				"dc.publisher.program.fl_str_mv":"Programa de P\u00f3s-Gradua\u00e7\u00e3o da institui\u00e7\u00e3o de defesa", \
+				"dc.publisher.programID.fl_str_mv":"Identificador \u00fanico do Programa de P\u00f3s-Gradua\u00e7\u00e3o da institui\u00e7\u00e3o de defesa", \
+				"dc.publisher.knowledgearea.fl_str_mv":"\u00c1rea do conhecimento", \
+				"dc.publisher.areaavaliacao.fl_str_mv":"\u00c1rea de avalia\u00e7\u00e3o", \
 				"eu_rights_str_mv":"Direitos", \
 				"dc.description.degreelevel.pt_BR.fl_txt_mv":"Grau", \
-				"dc.subject.por.fl_str_mv":"Assuntos em português", \
-				"dc.subject.eng.fl_str_mv":"Assuntos em inglês", \
-				"dc.identifier.citation.fl_str_mv":"Referência Bibliográfica"}
+				"dc.subject.por.fl_str_mv":"Assuntos em portugu\u00eas", \
+				"dc.subject.eng.fl_str_mv":"Assuntos em ingl\u00eas", \
+				"dc.identifier.citation.fl_str_mv":"Refer\u00eancia Bibliogr\u00e1fica"}
 		   
 #Aggregated fields, which gather multiple fields in a single column as a list
 file.agg-fields = {"Orientadores":"dc.contributor.advisor1.fl_str_mv,dc.contributor.advisor2.fl_str_mv", \
@@ -63,7 +64,7 @@ file.agg-fields = {"Orientadores":"dc.contributor.advisor1.fl_str_mv,dc.contribu
                    "ID Lattes dos membros da banca":"dc.contributor.referee1Lattes.fl_str_mv,dc.contributor.referee2Lattes.fl_str_mv,dc.contributor.referee3Lattes.fl_str_mv,dc.contributor.referee4Lattes.fl_str_mv,dc.contributor.referee5Lattes.fl_str_mv"}
 
 #Message to be show for empty fields
-file.null-msg = Não informado pela instituição
+file.null-msg = N\u00e3o informado pela institui\u00e7\u00e3o
 #Fields for which the message should not be shown if empty
 file.no-msg-fields = dc.contributor.co.fl_str_mv
 
