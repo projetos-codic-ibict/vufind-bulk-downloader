@@ -237,7 +237,7 @@ public class VufindQueryController {
 				}
 
 				// Send a confirmation email
-				// mailer.sendMail(sender, userEmail, confSubject, readyMsg);
+				mailer.sendMail(sender, userEmail, confSubject, readyMsg);
 				this.log.info("downloadUrl created for direct download: " + downloadUrl);
 				return downloadUrl;
 			} else {

@@ -6,7 +6,7 @@ query.solr-server = <URL>
 ##CSV file properties##
 
 #Directory where files will be saved to
-file.path = /usr/local/downloader-cvs/
+file.path = /tmp/vufind-bulk-downloader/
 #Separator character
 file.sep-char = ,
 #Symbol used to separate values in multiple-value fields
