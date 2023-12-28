@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
+@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties",
+		encoding = "UTF-8")
 public class VufindQueryController {
 
 	Log log = LogFactory.getLog(VufindQueryController.class);
@@ -158,7 +158,8 @@ public class VufindQueryController {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+			BufferedReader in =
+					new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
 			String inputLine;
 
 			// Read the response
@@ -178,15 +179,16 @@ public class VufindQueryController {
 		// Convert to CSV and save to compressed file
 		FileUtils f = new FileUtils();
 		List<String> userFields = getUserFields(queryString);
-		List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields, listSep, nullMsg,
-				noMsgFields);
+		List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,
+				listSep, nullMsg, noMsgFields);
 		f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
 	}
 
 	@RequestMapping("/existFile")
 	public boolean fileExists(@RequestParam(required = true) String queryString) {
 
-		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
+		String date =
+				ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 		String sufix = queryString + date;
 		String fileName = "search_result-" + String.valueOf(sufix.hashCode());
 		String outputFile = filePath + fileName;
@@ -205,8 +207,10 @@ public class VufindQueryController {
 
 	@RequestMapping("/query")
 	public String executeQuery(@RequestParam(required = true) String queryString,
-			@RequestParam(required = true) String download, @RequestParam(required = true) String totalRecords,
-			@RequestParam(required = true) String hasAbstract, @RequestParam(required = true) String encoding,
+			@RequestParam(required = true) String download,
+			@RequestParam(required = true) String totalRecords,
+			@RequestParam(required = true) String hasAbstract,
+			@RequestParam(required = true) String encoding,
 			@RequestParam(required = true) String userEmail) {
 		try {
 			this.log.info("init executeQuery...");
@@ -214,7 +218,8 @@ public class VufindQueryController {
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
 			// int numRecords = Integer.valueOf(totalRecords);
 
-			String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
+			String date =
+					ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 			String sufix = queryString + date;
 			String fileName = "search_result-" + String.valueOf(sufix.hashCode());
 			String outputFile = filePath + fileName;
@@ -232,7 +237,7 @@ public class VufindQueryController {
 				}
 
 				// Send a confirmation email
-				mailer.sendMail(sender, userEmail, confSubject, readyMsg);
+				// mailer.sendMail(sender, userEmail, confSubject, readyMsg);
 				this.log.info("downloadUrl created for direct download: " + downloadUrl);
 				return downloadUrl;
 			} else {
@@ -258,14 +263,16 @@ public class VufindQueryController {
 	}
 
 	@RequestMapping("/query/download")
-	public ResponseEntity<FileSystemResource> downloadFile(@RequestParam(required = true) String fileName)
-			throws IOException {
+	public ResponseEntity<FileSystemResource> downloadFile(
+			@RequestParam(required = true) String fileName) throws IOException {
 		this.log.info("init downloadFile...");
 		File file = new File(filePath + fileName);
 		FileSystemResource resource = new FileSystemResource(file);
 
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-				.contentType(MediaType.parseMediaType("application/zip")).contentLength(file.length()).body(resource);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+				.contentType(MediaType.parseMediaType("application/zip")).contentLength(file.length())
+				.body(resource);
 	}
 
 }
