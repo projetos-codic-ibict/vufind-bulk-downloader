@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties",
-		encoding = "UTF-8")
+@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
 
 	Log log = LogFactory.getLog(VufindQueryController.class);
@@ -123,7 +123,7 @@ public class VufindQueryController {
 		this.log.info("buildDownloadUrl to fileName: " + fileName);
 		try {
 			String fileUrl = null;
-			if (this.host.contains("oasisbr.ibict.br")) {
+			if (this.host.contains("ibict.br")) {
 				fileUrl = host + "/query/download?fileName=" + fileName;
 			} else {
 				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
@@ -158,8 +158,7 @@ public class VufindQueryController {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 
-			BufferedReader in =
-					new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
 			String inputLine;
 
 			// Read the response
@@ -187,8 +186,7 @@ public class VufindQueryController {
 	@RequestMapping("/existFile")
 	public boolean fileExists(@RequestParam(required = true) String queryString) {
 
-		String date =
-				ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
+		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 		String sufix = queryString + date;
 		String fileName = "search_result-" + String.valueOf(sufix.hashCode());
 		String outputFile = filePath + fileName;
@@ -218,8 +216,7 @@ public class VufindQueryController {
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
 			// int numRecords = Integer.valueOf(totalRecords);
 
-			String date =
-					ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
+			String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 			String sufix = queryString + date;
 			String fileName = "search_result-" + String.valueOf(sufix.hashCode());
 			String outputFile = filePath + fileName;
