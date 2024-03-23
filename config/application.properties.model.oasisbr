@@ -15,7 +15,9 @@ file.list-sep = ||
 #fields available for export defined in VuFind. If fields are to be aggregated 
 #in a single column, the header must be set to "null", and the new column header
 #defined in the 'file.agg-fields' property below
-file.header = {"author_facet":"Todos os autores", \
+file.header = {"title":"T\u00edtulo do documento", \
+				"publishDate":"Ano de publica\u00e7\u00e3o", \
+				"author_facet":"Todos os autores", \
 				"dc.contributor.advisor1.fl_str_mv":"null", \
 				"dc.contributor.advisor2.fl_str_mv":"null", \
 				"dc.contributor.advisor1Lattes.fl_str_mv":"null", \
@@ -31,8 +33,6 @@ file.header = {"author_facet":"Todos os autores", \
 				"dc.contributor.referee3Lattes.fl_str_mv":"null", \
 				"dc.contributor.referee4Lattes.fl_str_mv":"null", \
 				"dc.contributor.referee5Lattes.fl_str_mv":"null", \
-				"title":"T\u00edtulo do documento", \
-				"publishDate":"Data de publicação", \
 				"instname_str":"T\u00edtulo da institui\u00e7\u00e3o fonte", \
 				"institution":"Sigla da institui\u00e7\u00e3o fonte", \
 				"network_acronym_str":"Acronimo da institui\u00e7\u00e3o no Oasisbr", \
