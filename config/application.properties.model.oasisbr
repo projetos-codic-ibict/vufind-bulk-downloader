@@ -15,13 +15,14 @@ file.list-sep = ||
 #fields available for export defined in VuFind. If fields are to be aggregated 
 #in a single column, the header must be set to "null", and the new column header
 #defined in the 'file.agg-fields' property below
-file.header = {"author":"Autor(a)", \
-				"dc.contributor.authorLattes.fl_str_mv":"ID Lattes do(a) autor(a)", \
+file.header = {"title":"T\u00edtulo do documento", \
+				"publishDate":"Ano de publica\u00e7\u00e3o", \
+				"author_facet":"Todos os autores", \
 				"dc.contributor.advisor1.fl_str_mv":"null", \
 				"dc.contributor.advisor2.fl_str_mv":"null", \
 				"dc.contributor.advisor1Lattes.fl_str_mv":"null", \
 				"dc.contributor.advisor2Lattes.fl_str_mv":"null", \
-				"dc.contributor.co.fl_str_mv":"Co-orientador(a)", \
+				"dc.contributor.co.fl_str_mv":"null", \
 				"dc.contributor.referee1.fl_str_mv":"null", \
 				"dc.contributor.referee2.fl_str_mv":"null", \
 				"dc.contributor.referee3.fl_str_mv":"null", \
@@ -32,21 +33,32 @@ file.header = {"author":"Autor(a)", \
 				"dc.contributor.referee3Lattes.fl_str_mv":"null", \
 				"dc.contributor.referee4Lattes.fl_str_mv":"null", \
 				"dc.contributor.referee5Lattes.fl_str_mv":"null", \
-				"format": "Tipo de documento", \
-				"title":"T\u00edtulo", \
-				"dc.description.abstract.por.fl_txt_mv":"Resumo em Portugu\u00eas", \
-				"dc.description.abstract.eng.fl_txt_mv":"Resumo em Ingl\u00eas", \
-				"publishDate":"Ano de defesa", \
-				"instname_str":"Institui\u00e7\u00e3o de defesa", \
-				"instacron_str":"Sigla da institui\u00e7\u00e3o de defesa", \
+				"instname_str":"T\u00edtulo da institui\u00e7\u00e3o fonte", \
+				"institution":"Sigla da institui\u00e7\u00e3o fonte", \
+				"network_acronym_str":"Acronimo da institui\u00e7\u00e3o no Oasisbr", \
 				"dc.publisher.country.fl_str_mv":"Pa\u00eds da institui\u00e7\u00e3o de defesa", \
 				"dc.publisher.department.fl_str_mv":"Departamento da institui\u00e7\u00e3o de defesa", \
 				"dc.publisher.program.fl_str_mv":"Programa de P\u00f3s-Gradua\u00e7\u00e3o da institui\u00e7\u00e3o de defesa", \
-				"dc.subject.cnpq.fl_str_mv":"\u00c1rea do conhecimento", \
-				"eu_rights_str_mv":"Direitos", \
+				"dc.subject.cnpq.fl_str_mv":"\u00c1rea do conhecimento CNPq", \
+				"eu_rights_str_mv":"Direito autoral e o acesso livre", \
+				"format": "Tipo de documento", \
 				"dc.subject.por.fl_str_mv":"Assuntos em portugu\u00eas", \
 				"dc.subject.eng.fl_str_mv":"Assuntos em ingl\u00eas", \
-				"dc.identifier.citation.fl_str_mv":"Refer\u00eancia Bibliogr\u00e1fica"}
+				"dc.language.iso.fl_str_mv":"Idioma", \
+				"description": "Resumo", \
+				"dc.source.none.fl_str_mv":"Dados referenciais do documento ", \
+				"spelling":"Resumo + dados referenciais", \
+				"spellingShingle":"T\u00edtulo + primeiro autor + Palavras-chave", \
+				"reponame_str":"Nome da fonte", \
+				"dc.identifier.uri.fl_str_mv":"Link do documento", \
+				"identifier_str_mv":"DOI do documento ", \
+				"dc.description.abstract.por.fl_txt_mv":"Resumo em Portugu\u00eas", \
+				"dc.description.abstract.eng.fl_txt_mv":"Resumo em Ingl\u00eas", \
+				"dc.identifier.issn.pt_BR.fl_str_mv":"ISSN da revista " , \
+				"dc.identifier.isbn.pt_BR.fl_str_mv":"ISBN do livro ", \
+				"id":"ID no Oasisbr", \
+				"oai_identifier_str":"Link OAI do registro", \
+				"dc.identifier.citation.fl_str_mv":"Refer\u00eancia"}
 		   
 #Aggregated fields, which gather multiple fields in a single column as a list
 file.agg-fields = {"Orientadores":"dc.contributor.advisor1.fl_str_mv,dc.contributor.advisor2.fl_str_mv", \
@@ -102,5 +114,5 @@ time.units = {"day":"dia(s)", \
 ##Service host properties##
 server.ip = htttp://localhost
 server.port = 8081
-
+# Configuração da exportação RIS
 file.ris={"ty":"format", "au":"author_facet","py":"publishDate","ti":"title","la":"dc.language.iso.fl_str_mv", "ab":"description","di":"identifier_str_mv","ur":"dc.identifier.uri.fl_str_mv", "jo":"reponame_str", "issn":"dc.identifier.issn.pt_BR.fl_str_mv", "isbn":"dc.identifier.isbn.pt_BR.fl_str_mv"}
