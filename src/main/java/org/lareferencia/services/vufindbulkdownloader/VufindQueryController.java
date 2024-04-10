@@ -14,6 +14,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
+@PropertySource(value = "file:/home/victor/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
 
 	Log log = LogFactory.getLog(VufindQueryController.class);
@@ -51,6 +53,9 @@ public class VufindQueryController {
 
 	@Value("#{${file.header}}")
 	private Map<String, String> fieldList;
+
+	@Value("#{${file.ris}}")
+	private Map<String, String> fieldListRIS;
 
 	@Value("#{${file.agg-fields}}")
 	private Map<String, List<String>> aggFields;
@@ -138,19 +143,20 @@ public class VufindQueryController {
 
 	// Get the list of fields selected by the user for export
 	private List<String> getUserFields(String queryString) {
-
 		List<String> fields = new ArrayList<String>();
 
 		int listStart = queryString.lastIndexOf("&fl=") + 4;
 		String list = queryString.substring(listStart, queryString.indexOf('&', listStart));
 		fields = Stream.of(list.split(",")).collect(Collectors.toList());
-
 		return fields;
 	}
-
+	private List<String> getUserFieldsNew(Map<String, String> fields) {
+		List<String>userFields = new ArrayList<>(fields.values()); 
+		
+		return userFields;
+	}
 	// Query Solr to get the data and create a CSV file from it
 	private void createFile(String queryString, String outputFile, String encoding) {
-
 		StringBuffer content = new StringBuffer();
 
 		try {
@@ -178,9 +184,12 @@ public class VufindQueryController {
 		// Convert to CSV and save to compressed file
 		FileUtils f = new FileUtils();
 		List<String> userFields = getUserFields(queryString);
-		List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,
-				listSep, nullMsg, noMsgFields);
+		List<String> userFieldsRIS = getUserFieldsNew(fieldListRIS);
+		List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,listSep, nullMsg, noMsgFields);
+
+		String ris = f.JSONtoRIS(content.toString(), fieldList, userFieldsRIS, listSep, nullMsg, noMsgFields);
 		f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+		f.saveRISFile(ris, outputFile, filePath);
 	}
 
 	@RequestMapping("/existFile")
@@ -262,6 +271,8 @@ public class VufindQueryController {
 	@RequestMapping("/query/download")
 	public ResponseEntity<FileSystemResource> downloadFile(
 			@RequestParam(required = true) String fileName) throws IOException {
+		this.log.info("entrando na função");
+		this.log.info(fileName);
 		this.log.info("init downloadFile...");
 		File file = new File(filePath + fileName);
 		FileSystemResource resource = new FileSystemResource(file);
