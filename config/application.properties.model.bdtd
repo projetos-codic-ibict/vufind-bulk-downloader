@@ -47,7 +47,7 @@ file.header = {"dc.contributor.author.fl_str_mv":"Autor(a)", \
 				"dc.language.iso.fl_str_mv":"Idioma", \
 				"dc.description.abstract.none.fl_txt_mv": "Resumo", \
 				"dc.identifier.uri.fl_str_mv":"Link de acesso", \
-				"dc.description.resumo.por.fl_txt_mv":"Resumo em Portugu\u00eas", \
+				"dc.description.abstract.por.fl_txt_mv":"Resumo em Portugu\u00eas", \
 				"dc.description.abstract.eng.fl_txt_mv":"Resumo em Ingl\u00eas", \
 				"dc.identifier.citation.fl_str_mv":"Refer\u00eancia Bibliogr\u00e1fica"}
 		   
@@ -105,5 +105,3 @@ time.units = {"day":"dia(s)", \
 ##Service host properties##
 server.ip = htttp://localhost
 server.port = 8081
-
-file.ris={"ty":"format", "au":"author_facet","py":"publishDate","ti":"title","la":"dc.language.iso.fl_str_mv", "ab":"description","di":"identifier_str_mv","ur":"dc.identifier.uri.fl_str_mv", "jo":"reponame_str", "issn":"dc.identifier.issn.pt_BR.fl_str_mv", "isbn":"dc.identifier.isbn.pt_BR.fl_str_mv"}
