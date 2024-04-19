@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,6 +28,7 @@ import org.apache.commons.collections.list.FixedSizeList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.opencsv.CSVWriter;
 
@@ -225,81 +227,55 @@ public class FileUtils {
 	}
 
 	@SuppressWarnings({ "unchecked", "unlikely-arg-type" })
-	public String JSONtoRIS (String json, Map<String, String> fieldListRIS, List<String> userFields, 
-			 String listSep, String nullMsg, List<String> noMsgFields){
+	public String JSONtoRIS (String json, Map<String, String> fieldListRIS){
+
 				StringBuilder ris = new StringBuilder();
-				
+
 				try {
+					
 					JSONParser parser = new JSONParser();
 					Object resultObject = parser.parse(json);
-					if (resultObject instanceof JSONObject) {
-						JSONObject object = (JSONObject) resultObject;
-						JSONObject response = (JSONObject) object.get("response");
-						JSONArray docs = (JSONArray) response.get("docs");
+					JSONObject object = (JSONObject) resultObject;
+					JSONObject response = (JSONObject) object.get("response");
+					JSONArray docs = (JSONArray) response.get("docs");
+					
+					
+					for(int i=0;i<docs.size();i++){
+						JSONObject doc = (JSONObject) docs.get(i);
+						for(Map.Entry<String,String> entry : fieldListRIS.entrySet()){
+							String key = entry.getKey();
+							String valor = entry.getValue();
+
 						
-							for (Object docObject : docs) {
-								JSONObject doc = (JSONObject) docObject;
-								
-								
-								String TI = (String) doc.get("title");
-
-								
-								
-								JSONArray PYArray = (JSONArray) doc.get("publishDate");
-								String PY = formatArrays(PYArray);
-								JSONArray TYArray =  (JSONArray) doc.get("format");
-								String TY = formatArrays(TYArray);
-								
-								String ISSN = (String) doc.get("dc.identifier.issn.pt_BR.fl_str_mv");
-								String ISBN = (String) doc.get("dc.identifier.isbn.pt_BR.fl_str_mv");
-
-								JSONArray LAArray = (JSONArray) doc.get("dc.language.iso.fl_str_mv");
-								String LA = formatArrays(LAArray);
-								
-								String AB = (String) doc.get("description");
-								JSONArray DIArray = (JSONArray) doc.get("identifier_str_mv");
-								String DI = formatArrays(DIArray);
-								
-								JSONArray URArray = (JSONArray) doc.get("dc.identifier.uri.fl_str_mv");
-								String UR = formatArrays(URArray);
-								String JO = (String) doc.get("reponame_str");
-											
-								
-								ris.append("TY  - ").append(TY).append("\n");
-
-								JSONArray AUArray = (JSONArray) doc.get("author_facet");
-								
-								int autoNumber = AUArray.size();
-								for(int e = 0;e < autoNumber;e++){
-									ris.append("AU  - ").append(AUArray.get(e)).append("\n");
-								}
-
-								ris.append("PY  - ").append(PY).append("\n");
-								ris.append("TI  - ").append(TI).append("\n");
-								ris.append("LA  - ").append(LA).append("\n");
-								if(ISSN != null){
-									ris.append("SN  - ").append(ISSN).append("\n");
-								}else if (ISBN != null) {
-									ris.append("SN  - ").append(ISBN).append("\n");
-								} else{
-									ris.append("SN  - ").append("-").append("\n");
-								}
-								if(AB != null){
-									ris.append("AB  - ").append(AB).append("\n");
-								}else{
-									ris.append("AB  - ").append("-").append("\n");
-								}
-								
-								ris.append("DI  - ").append(DI).append("\n");
-								ris.append("UR  - ").append(UR).append("\n");
-								ris.append("JO  - ").append(JO).append("\n");
-								ris.append("ER  - \n\n");
-							}
+								if(doc instanceof JSONObject){
+									if(doc.get(valor) instanceof JSONArray){
+										JSONArray arrayValor = (JSONArray)doc.get(valor);
+										
+										if(key.equals("AU")){
+											int autorNumber = arrayValor.size();
+											for(int e = 0;e < autorNumber;e++){
+											ris.append(key).append(" - ").append(arrayValor.get(e)).append("\n");
+										}
+										}else{
+											ris.append(key).append(" - ").append(formatArrays(arrayValor)).append("\n");	
+										}
+									}else{
+										
+										ris.append(key).append(" - ").append(doc.get(valor)).append("\n");
+									}
+							
+							
+						}
+					} 
+					ris.append("ER").append(" - ").append("\n\n");
+				}
 						
-					}
-				} catch (Exception e) {
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 				return ris.toString();
 
 			}

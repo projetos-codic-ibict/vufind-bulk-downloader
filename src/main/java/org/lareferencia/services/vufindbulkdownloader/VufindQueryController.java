@@ -150,13 +150,8 @@ public class VufindQueryController {
 		fields = Stream.of(list.split(",")).collect(Collectors.toList());
 		return fields;
 	}
-	private List<String> getUserFieldsNew(Map<String, String> fields) {
-		List<String>userFields = new ArrayList<>(fields.values()); 
-		
-		return userFields;
-	}
 	// Query Solr to get the data and create a CSV file from it
-	private void createFile(String queryString, String outputFile, String encoding) {
+	private void createFile(String queryString, String outputFile, String encoding, boolean risOrNot) {
 		StringBuffer content = new StringBuffer();
 
 		try {
@@ -184,12 +179,13 @@ public class VufindQueryController {
 		// Convert to CSV and save to compressed file
 		FileUtils f = new FileUtils();
 		List<String> userFields = getUserFields(queryString);
-		List<String> userFieldsRIS = getUserFieldsNew(fieldListRIS);
-		List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,listSep, nullMsg, noMsgFields);
-
-		String ris = f.JSONtoRIS(content.toString(), fieldList, userFieldsRIS, listSep, nullMsg, noMsgFields);
-		f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
-		f.saveRISFile(ris, outputFile, filePath);
+		if(risOrNot){
+			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
+			f.saveRISFile(ris, outputFile, filePath);
+		}else{
+			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,listSep, nullMsg, noMsgFields);
+			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+		}
 	}
 
 	@RequestMapping("/existFile")
@@ -218,7 +214,8 @@ public class VufindQueryController {
 			@RequestParam(required = true) String totalRecords,
 			@RequestParam(required = true) String hasAbstract,
 			@RequestParam(required = true) String encoding,
-			@RequestParam(required = true) String userEmail) {
+			@RequestParam(required = true) String userEmail,
+			@RequestParam(required = false) String type) {
 		try {
 			this.log.info("init executeQuery...");
 			boolean isDownload = Boolean.parseBoolean(download);
@@ -239,7 +236,11 @@ public class VufindQueryController {
 				// Only creates the CSV file if a file created from the same query does not
 				// already exist
 				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
-					createFile(queryString, outputFile, encoding);
+					if(type == null){
+						createFile(queryString, outputFile, encoding, false);
+					}else{
+						createFile(queryString, outputFile, encoding, true);
+					}
 				}
 
 				// Send a confirmation email
@@ -254,7 +255,12 @@ public class VufindQueryController {
 				mailer.sendMail(sender, userEmail, confSubject, waitMsg);
 
 				// Create the CSV file
-				createFile(queryString, outputFile, encoding);
+				//createFile(queryString, outputFile, encoding);
+				if(type == null){
+					createFile(queryString, outputFile, encoding, false);
+				}else{
+					createFile(queryString, outputFile, encoding, true);
+				}
 
 				// Send download URL by email
 				String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
