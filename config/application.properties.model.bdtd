@@ -105,5 +105,3 @@ time.units = {"day":"dia(s)", \
 ##Service host properties##
 server.ip = htttp://localhost
 server.port = 8081
-
-file.ris={"ty":"format", "au":"author_facet","py":"publishDate","ti":"title","la":"dc.language.iso.fl_str_mv", "ab":"description","di":"identifier_str_mv","ur":"dc.identifier.uri.fl_str_mv", "jo":"reponame_str", "issn":"dc.identifier.issn.pt_BR.fl_str_mv", "isbn":"dc.identifier.isbn.pt_BR.fl_str_mv"}
