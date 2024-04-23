@@ -1,17 +1,23 @@
 package org.lareferencia.services.vufindbulkdownloader;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +28,7 @@ import org.apache.commons.collections.list.FixedSizeList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.opencsv.CSVWriter;
 
@@ -91,8 +98,7 @@ public class FileUtils {
 			Map<String, List<String>> aggFields, String listSep, String nullMsg, List<String> noMsgFields){
 		
 		List<List<String>> csv = new ArrayList<List<String>>();
-		Set<String> fields = fieldList.keySet();
-		
+		Set<String> fields = fieldList.keySet();	
 		//Add header
 		List<String> header = new ArrayList<String>();
 		int colIndex = 0;
@@ -101,6 +107,7 @@ public class FileUtils {
 			if (userFields.contains(field)){
 				String label = fieldList.get(field);
 				if (!label.equals("null")){
+					
 					header.add(label);
 					columnIndexes.put(label, colIndex++);
 				}
@@ -191,6 +198,7 @@ public class FileUtils {
                 		}
                 		line.set(index, listToString(items, listSep, nullMsg));
                 	}
+					
                 	csv.add(line);
                 }
             }
@@ -202,17 +210,85 @@ public class FileUtils {
 		
 		return csv;
 	}
+
+	private String formatArrays(JSONArray receivedArray) {
+		StringBuilder formattedArray = new StringBuilder();
+		if(receivedArray == null){
+			return "-";
+		}
+		for (Object authorObj : receivedArray) {
+			String author = (String) authorObj;
+			formattedArray.append(author).append("; ");
+		}
+		if (formattedArray.length() > 0) {
+			formattedArray.setLength(formattedArray.length() - 2);
+		}
+		return formattedArray.toString();
+	}
+
+	@SuppressWarnings({ "unchecked", "unlikely-arg-type" })
+	public String JSONtoRIS (String json, Map<String, String> fieldListRIS){
+
+				StringBuilder ris = new StringBuilder();
+
+				try {
+					
+					JSONParser parser = new JSONParser();
+					Object resultObject = parser.parse(json);
+					JSONObject object = (JSONObject) resultObject;
+					JSONObject response = (JSONObject) object.get("response");
+					JSONArray docs = (JSONArray) response.get("docs");
+					
+					
+					for(int i=0;i<docs.size();i++){
+						JSONObject doc = (JSONObject) docs.get(i);
+						for(Map.Entry<String,String> entry : fieldListRIS.entrySet()){
+							String key = entry.getKey();
+							String valor = entry.getValue();
+
+						
+								if(doc instanceof JSONObject){
+									if(doc.get(valor) instanceof JSONArray){
+										JSONArray arrayValor = (JSONArray)doc.get(valor);
+										
+										if(key.equals("AU")){
+											int autorNumber = arrayValor.size();
+											for(int e = 0;e < autorNumber;e++){
+											ris.append(key).append(" - ").append(arrayValor.get(e)).append("\n");
+										}
+										}else{
+											ris.append(key).append(" - ").append(formatArrays(arrayValor)).append("\n");	
+										}
+									}else{
+										
+										ris.append(key).append(" - ").append(doc.get(valor)).append("\n");
+									}
+							
+							
+						}
+					} 
+					ris.append("ER").append(" - ").append("\n\n");
+				}
+						
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				return ris.toString();
+
+			}
+
 	
 	// Create a zip file containing the CSV file
 	private void compressFile (String inputfile){
-		
 		File file = new File(inputfile);
 		File compressed = new File(inputfile.replace(".csv", ".zip"));
 		
 		try{
 			ZipOutputStream writer = new ZipOutputStream(new FileOutputStream(compressed));
 			ZipEntry entry = new ZipEntry(file.getName());
-		
 			writer.putNextEntry(entry);
 			Files.copy(file.toPath(), writer);
 			writer.closeEntry();
@@ -222,6 +298,8 @@ public class FileUtils {
 			e.printStackTrace();	
 		}
 	}
+
+
 	
 	// Write the CSV content to a file
 	public void saveCSVFile(List<List<String>> records, char sep, String outputfile, String encoding, boolean compress){
@@ -249,4 +327,15 @@ public class FileUtils {
 			e.printStackTrace();
 		}
 	}
+
+
+	public void saveRISFile(String content, String fileName, String directory) {
+        try {
+            FileWriter writer = new FileWriter(fileName + ".ris");
+            writer.write(content);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

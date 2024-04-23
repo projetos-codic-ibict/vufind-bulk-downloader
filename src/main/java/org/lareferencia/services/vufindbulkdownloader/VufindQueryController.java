@@ -14,6 +14,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/home/jesielviana/dev/ibict/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
+@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
 
 	Log log = LogFactory.getLog(VufindQueryController.class);
@@ -51,6 +53,9 @@ public class VufindQueryController {
 
 	@Value("#{${file.header}}")
 	private Map<String, String> fieldList;
+
+	@Value("#{${file.ris}}")
+	private Map<String, String> fieldListRIS;
 
 	@Value("#{${file.agg-fields}}")
 	private Map<String, List<String>> aggFields;
@@ -138,19 +143,15 @@ public class VufindQueryController {
 
 	// Get the list of fields selected by the user for export
 	private List<String> getUserFields(String queryString) {
-
 		List<String> fields = new ArrayList<String>();
 
 		int listStart = queryString.lastIndexOf("&fl=") + 4;
 		String list = queryString.substring(listStart, queryString.indexOf('&', listStart));
 		fields = Stream.of(list.split(",")).collect(Collectors.toList());
-
 		return fields;
 	}
-
 	// Query Solr to get the data and create a CSV file from it
-	private void createFile(String queryString, String outputFile, String encoding) {
-
+	private void createFile(String queryString, String outputFile, String encoding, boolean risOrNot) {
 		StringBuffer content = new StringBuffer();
 
 		try {
@@ -178,9 +179,13 @@ public class VufindQueryController {
 		// Convert to CSV and save to compressed file
 		FileUtils f = new FileUtils();
 		List<String> userFields = getUserFields(queryString);
-		List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,
-				listSep, nullMsg, noMsgFields);
-		f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+		if(risOrNot){
+			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
+			f.saveRISFile(ris, outputFile, filePath);
+		}else{
+			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,listSep, nullMsg, noMsgFields);
+			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+		}
 	}
 
 	@RequestMapping("/existFile")
@@ -209,7 +214,8 @@ public class VufindQueryController {
 			@RequestParam(required = true) String totalRecords,
 			@RequestParam(required = true) String hasAbstract,
 			@RequestParam(required = true) String encoding,
-			@RequestParam(required = true) String userEmail) {
+			@RequestParam(required = true) String userEmail,
+			@RequestParam(required = false) String type) {
 		try {
 			this.log.info("init executeQuery...");
 			boolean isDownload = Boolean.parseBoolean(download);
@@ -230,7 +236,11 @@ public class VufindQueryController {
 				// Only creates the CSV file if a file created from the same query does not
 				// already exist
 				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
-					createFile(queryString, outputFile, encoding);
+					if(type == null){
+						createFile(queryString, outputFile, encoding, false);
+					}else{
+						createFile(queryString, outputFile, encoding, true);
+					}
 				}
 
 				// Send a confirmation email
@@ -245,7 +255,12 @@ public class VufindQueryController {
 				mailer.sendMail(sender, userEmail, confSubject, waitMsg);
 
 				// Create the CSV file
-				createFile(queryString, outputFile, encoding);
+				//createFile(queryString, outputFile, encoding);
+				if(type == null){
+					createFile(queryString, outputFile, encoding, false);
+				}else{
+					createFile(queryString, outputFile, encoding, true);
+				}
 
 				// Send download URL by email
 				String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
@@ -262,6 +277,8 @@ public class VufindQueryController {
 	@RequestMapping("/query/download")
 	public ResponseEntity<FileSystemResource> downloadFile(
 			@RequestParam(required = true) String fileName) throws IOException {
+		this.log.info("entrando na função");
+		this.log.info(fileName);
 		this.log.info("init downloadFile...");
 		File file = new File(filePath + fileName);
 		FileSystemResource resource = new FileSystemResource(file);
