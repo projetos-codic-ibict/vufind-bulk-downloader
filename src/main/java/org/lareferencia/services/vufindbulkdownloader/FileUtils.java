@@ -299,6 +299,25 @@ public class FileUtils {
 		}
 	}
 
+	private void compressFileRIS (String inputfile){
+		System.out.println("---------------");
+		System.out.println(inputfile);
+		File file = new File(inputfile);
+		File compressed = new File(inputfile.replace(".ris", ".zip"));
+		
+		try{
+			ZipOutputStream writer = new ZipOutputStream(new FileOutputStream(compressed));
+			ZipEntry entry = new ZipEntry(file.getName());
+			writer.putNextEntry(entry);
+			Files.copy(file.toPath(), writer);
+			writer.closeEntry();
+			writer.close();
+		}
+		catch(IOException e){  
+			e.printStackTrace();	
+		}
+	}
+
 
 	
 	// Write the CSV content to a file
@@ -329,11 +348,15 @@ public class FileUtils {
 	}
 
 
-	public void saveRISFile(String content, String fileName, String directory) {
+	public void saveRISFile(String content, String fileName, String directory, boolean compress) {
         try {
             FileWriter writer = new FileWriter(fileName + ".ris");
             writer.write(content);
             writer.close();
+			if (compress){
+	        	compressFileRIS(fileName + ".ris");
+	        	Files.delete(Paths.get(fileName + ".ris")); //remove CSV file
+	        } 
         } catch (IOException e) {
             e.printStackTrace();
         }

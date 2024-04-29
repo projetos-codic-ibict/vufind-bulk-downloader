@@ -181,7 +181,7 @@ public class VufindQueryController {
 		List<String> userFields = getUserFields(queryString);
 		if(risOrNot){
 			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
-			f.saveRISFile(ris, outputFile, filePath);
+			f.saveRISFile(ris, outputFile, filePath, true);
 		}else{
 			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,listSep, nullMsg, noMsgFields);
 			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
@@ -190,11 +190,13 @@ public class VufindQueryController {
 
 	@RequestMapping("/existFile")
 	public boolean fileExists(@RequestParam(required = true) String queryString) {
-
+		System.out.println("entrou no existsFile");
 		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 		String sufix = queryString + date;
 		String fileName = "search_result-" + String.valueOf(sufix.hashCode());
 		String outputFile = filePath + fileName;
+		System.out.println("-------------");
+		System.out.println(outputFile);
 
 		if (Files.exists(Paths.get(outputFile + ".zip"))) {
 			return true;
@@ -214,9 +216,21 @@ public class VufindQueryController {
 			@RequestParam(required = true) String totalRecords,
 			@RequestParam(required = true) String hasAbstract,
 			@RequestParam(required = true) String encoding,
-			@RequestParam(required = true) String userEmail,
-			@RequestParam(required = false) String type) {
+			@RequestParam(required = true) String userEmail) {
 		try {
+			String[] paramArray = queryString.split("&");
+			String paramStringType = paramArray[paramArray.length - 1];
+			System.out.println("-------------------------------");
+			System.out.println("-----records-----");
+			System.out.println(totalRecords);
+
+			System.out.println("------param--------");
+			System.out.println(paramStringType);
+			String[] parts = paramStringType.split("=");
+			String type = parts[parts.length - 1];
+
+			System.out.println("--------type---------");
+			System.out.println(type);
 			this.log.info("init executeQuery...");
 			boolean isDownload = Boolean.parseBoolean(download);
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
@@ -225,6 +239,14 @@ public class VufindQueryController {
 			String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 			String sufix = queryString + date;
 			String fileName = "search_result-" + String.valueOf(sufix.hashCode());
+			if(type.equals("ris")){
+				fileName = fileName + type;
+				System.out.println(fileName);
+			}
+			System.out.println("---totalRecord----");
+			System.out.println(totalRecords);
+			System.out.println("-------fileName:----------");
+			System.out.println(fileName);
 			String outputFile = filePath + fileName;
 			String downloadUrl = buildDownloadUrl(fileName + ".zip");
 
@@ -236,7 +258,7 @@ public class VufindQueryController {
 				// Only creates the CSV file if a file created from the same query does not
 				// already exist
 				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
-					if(type == null){
+					if(type.equals("ris")){
 						createFile(queryString, outputFile, encoding, false);
 					}else{
 						createFile(queryString, outputFile, encoding, true);
@@ -256,7 +278,7 @@ public class VufindQueryController {
 
 				// Create the CSV file
 				//createFile(queryString, outputFile, encoding);
-				if(type == null){
+				if(type.equals("ris")){
 					createFile(queryString, outputFile, encoding, false);
 				}else{
 					createFile(queryString, outputFile, encoding, true);
