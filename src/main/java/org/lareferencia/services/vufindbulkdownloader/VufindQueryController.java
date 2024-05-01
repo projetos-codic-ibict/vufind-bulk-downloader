@@ -259,9 +259,9 @@ public class VufindQueryController {
 				// already exist
 				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
 					if(type.equals("ris")){
-						createFile(queryString, outputFile, encoding, false);
-					}else{
 						createFile(queryString, outputFile, encoding, true);
+					}else{
+						createFile(queryString, outputFile, encoding, false);
 					}
 				}
 
@@ -279,9 +279,9 @@ public class VufindQueryController {
 				// Create the CSV file
 				//createFile(queryString, outputFile, encoding);
 				if(type.equals("ris")){
-					createFile(queryString, outputFile, encoding, false);
-				}else{
 					createFile(queryString, outputFile, encoding, true);
+				}else{
+					createFile(queryString, outputFile, encoding, false);
 				}
 
 				// Send download URL by email

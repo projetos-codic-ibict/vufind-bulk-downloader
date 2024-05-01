@@ -207,7 +207,6 @@ public class FileUtils {
         catch (Exception e) {
         	e.printStackTrace();;
         }
-		
 		return csv;
 	}
 
@@ -275,7 +274,6 @@ public class FileUtils {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 				return ris.toString();
 
 			}
