@@ -15,7 +15,7 @@ file.list-sep = ||
 #fields available for export defined in VuFind. If fields are to be aggregated 
 #in a single column, the header must be set to "null", and the new column header
 #defined in the 'file.agg-fields' property below
-file.header = {"dc.contributor.author.fl_str_mv":"Autor(a)", \
+file.header = {"author_facet":"Autor(a)", \
 				"dc.contributor.authorLattes.fl_str_mv":"ID Lattes do(a) autor(a)", \
 				"dc.contributor.advisor1.fl_str_mv":"null", \
 				"dc.contributor.advisor2.fl_str_mv":"null", \
