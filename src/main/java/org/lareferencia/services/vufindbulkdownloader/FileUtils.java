@@ -207,7 +207,6 @@ public class FileUtils {
         catch (Exception e) {
         	e.printStackTrace();;
         }
-		
 		return csv;
 	}
 
@@ -257,11 +256,18 @@ public class FileUtils {
 											ris.append(key).append(" - ").append(arrayValor.get(e)).append("\n");
 										}
 										}else{
-											ris.append(key).append(" - ").append(formatArrays(arrayValor)).append("\n");	
+											if(formatArrays(arrayValor) == null){
+												ris.append(key).append(" - ").append("").append("\n");	
+											}else{
+												ris.append(key).append(" - ").append(formatArrays(arrayValor)).append("\n");	
+											}
 										}
 									}else{
-										
-										ris.append(key).append(" - ").append(doc.get(valor)).append("\n");
+										if(doc.get(valor) == null){
+											ris.append(key).append(" - ").append("").append("\n");	
+										}else{
+											ris.append(key).append(" - ").append(doc.get(valor)).append("\n");
+										}
 									}
 							
 							
@@ -275,7 +281,6 @@ public class FileUtils {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 				return ris.toString();
 
 			}
@@ -285,6 +290,25 @@ public class FileUtils {
 	private void compressFile (String inputfile){
 		File file = new File(inputfile);
 		File compressed = new File(inputfile.replace(".csv", ".zip"));
+		
+		try{
+			ZipOutputStream writer = new ZipOutputStream(new FileOutputStream(compressed));
+			ZipEntry entry = new ZipEntry(file.getName());
+			writer.putNextEntry(entry);
+			Files.copy(file.toPath(), writer);
+			writer.closeEntry();
+			writer.close();
+		}
+		catch(IOException e){  
+			e.printStackTrace();	
+		}
+	}
+
+	private void compressFileRIS (String inputfile){
+		System.out.println("---------------");
+		System.out.println(inputfile);
+		File file = new File(inputfile);
+		File compressed = new File(inputfile.replace(".ris", ".zip"));
 		
 		try{
 			ZipOutputStream writer = new ZipOutputStream(new FileOutputStream(compressed));
@@ -329,11 +353,15 @@ public class FileUtils {
 	}
 
 
-	public void saveRISFile(String content, String fileName, String directory) {
+	public void saveRISFile(String content, String fileName, String directory, boolean compress) {
         try {
             FileWriter writer = new FileWriter(fileName + ".ris");
             writer.write(content);
             writer.close();
+			if (compress){
+	        	compressFileRIS(fileName + ".ris");
+	        	Files.delete(Paths.get(fileName + ".ris")); //remove CSV file
+	        } 
         } catch (IOException e) {
             e.printStackTrace();
         }
