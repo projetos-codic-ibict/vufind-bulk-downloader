@@ -32,7 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+///usr/local/vufind-bulk-downloader/config/application.properties
 @RestController
 @PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
@@ -141,6 +141,12 @@ public class VufindQueryController {
 		}
 	}
 
+	private String generetaFileName(String queryString){
+		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
+    	String sufix = queryString + date;
+    	return "search_result-" + String.valueOf(sufix.hashCode());
+	}
+
 	// Get the list of fields selected by the user for export
 	private List<String> getUserFields(String queryString) {
 		List<String> fields = new ArrayList<String>();
@@ -191,9 +197,7 @@ public class VufindQueryController {
 	@RequestMapping("/existFile")
 	public boolean fileExists(@RequestParam(required = true) String queryString) {
 		System.out.println("entrou no existsFile");
-		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
-		String sufix = queryString + date;
-		String fileName = "search_result-" + String.valueOf(sufix.hashCode());
+		String fileName = generetaFileName(queryString);
 		String outputFile = filePath + fileName;
 		System.out.println("-------------");
 		System.out.println(outputFile);
@@ -236,9 +240,7 @@ public class VufindQueryController {
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
 			// int numRecords = Integer.valueOf(totalRecords);
 
-			String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
-			String sufix = queryString + date;
-			String fileName = "search_result-" + String.valueOf(sufix.hashCode());
+			String fileName = generetaFileName(queryString);
 			if(type.equals("ris")){
 				fileName = fileName + type;
 				System.out.println(fileName);

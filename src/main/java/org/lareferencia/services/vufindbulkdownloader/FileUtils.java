@@ -287,9 +287,9 @@ public class FileUtils {
 
 	
 	// Create a zip file containing the CSV file
-	private void compressFile (String inputfile){
+	private void compressFile (String inputfile, String type){
 		File file = new File(inputfile);
-		File compressed = new File(inputfile.replace(".csv", ".zip"));
+		File compressed = new File(inputfile.replace(type, ".zip"));
 		
 		try{
 			ZipOutputStream writer = new ZipOutputStream(new FileOutputStream(compressed));
@@ -304,7 +304,7 @@ public class FileUtils {
 		}
 	}
 
-	private void compressFileRIS (String inputfile){
+	/*private void compressFileRIS (String inputfile){
 		System.out.println("---------------");
 		System.out.println(inputfile);
 		File file = new File(inputfile);
@@ -321,7 +321,7 @@ public class FileUtils {
 		catch(IOException e){  
 			e.printStackTrace();	
 		}
-	}
+	}*/
 
 
 	
@@ -343,7 +343,7 @@ public class FileUtils {
 	        writer.close(); 
 	        
 	        if (compress){
-	        	compressFile(outputfile + ".csv");
+	        	compressFile(outputfile + ".csv", ".csv");
 	        	Files.delete(Paths.get(outputfile + ".csv")); //remove CSV file
 	        }  
 	    }
@@ -359,7 +359,7 @@ public class FileUtils {
             writer.write(content);
             writer.close();
 			if (compress){
-	        	compressFileRIS(fileName + ".ris");
+	        	compressFile(fileName + ".ris", ".ris");
 	        	Files.delete(Paths.get(fileName + ".ris")); //remove CSV file
 	        } 
         } catch (IOException e) {
