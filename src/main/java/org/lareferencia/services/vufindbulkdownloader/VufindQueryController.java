@@ -233,7 +233,6 @@ public class VufindQueryController {
 
 			String fileName = generetaFileName(queryString, type);
 			if(type.equals("ris")){
-				fileName = fileName + type;
 				System.out.println(fileName);
 			}
 			System.out.println("---totalRecord----");
