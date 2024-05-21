@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-///usr/local/vufind-bulk-downloader/config/application.properties
 @RestController
 @PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
@@ -141,10 +140,10 @@ public class VufindQueryController {
 		}
 	}
 
-	private String generetaFileName(String queryString){
+	private String generetaFileName(String queryString, String type){
 		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
     	String sufix = queryString + date;
-    	return "search_result-" + String.valueOf(sufix.hashCode());
+    	return "search_result-" + String.valueOf(sufix.hashCode()) + "-" + type;
 	}
 
 	// Get the list of fields selected by the user for export
@@ -195,9 +194,10 @@ public class VufindQueryController {
 	}
 
 	@RequestMapping("/existFile")
-	public boolean fileExists(@RequestParam(required = true) String queryString) {
+	public boolean fileExists(@RequestParam(required = true) String queryString,@RequestParam(required = true) String type) {
+		System.out.println(type);
 		System.out.println("entrou no existsFile");
-		String fileName = generetaFileName(queryString);
+		String fileName = generetaFileName(queryString, type);
 		String outputFile = filePath + fileName;
 		System.out.println("-------------");
 		System.out.println(outputFile);
@@ -220,19 +220,10 @@ public class VufindQueryController {
 			@RequestParam(required = true) String totalRecords,
 			@RequestParam(required = true) String hasAbstract,
 			@RequestParam(required = true) String encoding,
-			@RequestParam(required = true) String userEmail) {
+			@RequestParam(required = true) String userEmail,
+			@RequestParam(required = true) String type) {
 		try {
-			String[] paramArray = queryString.split("&");
-			String paramStringType = paramArray[paramArray.length - 1];
-			System.out.println("-------------------------------");
-			System.out.println("-----records-----");
-			System.out.println(totalRecords);
-
-			System.out.println("------param--------");
-			System.out.println(paramStringType);
-			String[] parts = paramStringType.split("=");
-			String type = parts[parts.length - 1];
-
+			
 			System.out.println("--------type---------");
 			System.out.println(type);
 			this.log.info("init executeQuery...");
@@ -240,7 +231,7 @@ public class VufindQueryController {
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
 			// int numRecords = Integer.valueOf(totalRecords);
 
-			String fileName = generetaFileName(queryString);
+			String fileName = generetaFileName(queryString, type);
 			if(type.equals("ris")){
 				fileName = fileName + type;
 				System.out.println(fileName);
