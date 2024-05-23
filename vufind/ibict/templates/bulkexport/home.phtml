@@ -1,7 +1,7 @@
 <?php 
 $form = $this->form;
 $form->prepare();
-$form->setAttribute('action', $this->url('bulkexport-csv') . '?total=' . $this->total);
+$form->setAttribute('action', $this->url('bulkexport-csv') . '?total=' . $this->total . '&type=' . $this->type);
 $form->setAttribute('method', 'post');
 
 $defFields = explode(',', $this->defFields);
