@@ -103,5 +103,5 @@ time.units = {"day":"dia(s)", \
 			  "conjunction":"e"}
 
 ##Service host properties##
-server.ip = htttp://localhost
+server.ip = http://localhost
 server.port = 8081

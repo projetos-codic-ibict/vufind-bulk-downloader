@@ -14,7 +14,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
@@ -140,10 +140,10 @@ public class VufindQueryController {
 		}
 	}
 
-	private String generetaFileName(String queryString, String type){
+	private String generetaFileName(String queryString, String type) {
 		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
-    	String sufix = queryString + date;
-    	return "search_result-" + String.valueOf(sufix.hashCode()) + "-" + type;
+		String sufix = queryString + date;
+		return "search_result-" + String.valueOf(sufix.hashCode()) + "-" + type;
 	}
 
 	// Get the list of fields selected by the user for export
@@ -155,6 +155,7 @@ public class VufindQueryController {
 		fields = Stream.of(list.split(",")).collect(Collectors.toList());
 		return fields;
 	}
+
 	// Query Solr to get the data and create a CSV file from it
 	private void createFile(String queryString, String outputFile, String encoding, boolean risOrNot) {
 		StringBuffer content = new StringBuffer();
@@ -184,17 +185,22 @@ public class VufindQueryController {
 		// Convert to CSV and save to compressed file
 		FileUtils f = new FileUtils();
 		List<String> userFields = getUserFields(queryString);
-		if(risOrNot){
+		if (risOrNot) {
 			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
 			f.saveRISFile(ris, outputFile, filePath, true);
-		}else{
-			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields,listSep, nullMsg, noMsgFields);
+		} else {
+			if (aggFields == null) {
+				aggFields = new HashMap<>();
+			}
+			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields, listSep, nullMsg,
+					noMsgFields);
 			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
 		}
 	}
 
 	@RequestMapping("/existFile")
-	public boolean fileExists(@RequestParam(required = true) String queryString,@RequestParam(required = true) String type) {
+	public boolean fileExists(@RequestParam(required = true) String queryString,
+			@RequestParam(required = true) String type) {
 		System.out.println(type);
 		System.out.println("entrou no existsFile");
 		String fileName = generetaFileName(queryString, type);
@@ -223,7 +229,7 @@ public class VufindQueryController {
 			@RequestParam(required = true) String userEmail,
 			@RequestParam(required = true) String type) {
 		try {
-			
+
 			System.out.println("--------type---------");
 			System.out.println(type);
 			this.log.info("init executeQuery...");
@@ -232,7 +238,7 @@ public class VufindQueryController {
 			// int numRecords = Integer.valueOf(totalRecords);
 
 			String fileName = generetaFileName(queryString, type);
-			if(type.equals("ris")){
+			if (type.equals("ris")) {
 				System.out.println(fileName);
 			}
 			System.out.println("---totalRecord----");
@@ -250,9 +256,9 @@ public class VufindQueryController {
 				// Only creates the CSV file if a file created from the same query does not
 				// already exist
 				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
-					if(type.equals("ris")){
+					if (type.equals("ris")) {
 						createFile(queryString, outputFile, encoding, true);
-					}else{
+					} else {
 						createFile(queryString, outputFile, encoding, false);
 					}
 				}
@@ -269,10 +275,10 @@ public class VufindQueryController {
 				mailer.sendMail(sender, userEmail, confSubject, waitMsg);
 
 				// Create the CSV file
-				//createFile(queryString, outputFile, encoding);
-				if(type.equals("ris")){
+				// createFile(queryString, outputFile, encoding);
+				if (type.equals("ris")) {
 					createFile(queryString, outputFile, encoding, true);
-				}else{
+				} else {
 					createFile(queryString, outputFile, encoding, false);
 				}
 
