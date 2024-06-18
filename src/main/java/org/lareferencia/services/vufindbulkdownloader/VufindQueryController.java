@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
+@PropertySource(value = "file:/home/kedna/ibict/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
 
 	Log log = LogFactory.getLog(VufindQueryController.class);
