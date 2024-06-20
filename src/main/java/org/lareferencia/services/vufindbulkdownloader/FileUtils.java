@@ -261,7 +261,7 @@ public class FileUtils {
 
 					}
 				}
-				ris.append("ER").append(separator).append("\n\n");
+				ris.append("ER").append(separator).append("\n");
 			}
 
 		} catch (ParseException e) {
