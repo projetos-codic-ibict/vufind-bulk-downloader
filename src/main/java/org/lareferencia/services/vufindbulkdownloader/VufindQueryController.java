@@ -161,6 +161,7 @@ public class VufindQueryController {
 		StringBuffer content = new StringBuffer();
 
 		try {
+			// URL url = URI.create(buildQueryUrl(queryString)).toURL();
 			URL url = new URL(buildQueryUrl(queryString));
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
@@ -184,6 +185,7 @@ public class VufindQueryController {
 
 		// Convert to CSV and save to compressed file
 		FileUtils f = new FileUtils();
+		f.mkdirFilePathDirectoyIfNotExists(filePath);
 		List<String> userFields = getUserFields(queryString);
 		if (risOrNot) {
 			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);

@@ -350,4 +350,25 @@ public class FileUtils {
 			e.printStackTrace();
 		}
 	}
+
+	public void mkdirFilePathDirectoyIfNotExists(String filePath) {
+		// Cria um objeto File representando a pasta
+		System.out.println("filePath" + filePath);
+		File directory = new File(filePath);
+
+		// Verifica se a pasta já existe
+		if (!directory.exists()) {
+			// Tenta criar a pasta
+			boolean directoryCreated = directory.mkdirs();
+
+			// Verifica se a pasta foi criada com sucesso
+			if (directoryCreated) {
+				System.out.println(filePath + " Pasta criada com sucesso!");
+			} else {
+				System.out.println("Falha ao criar a pasta.");
+			}
+		} else {
+			System.out.println("A pasta já existe: " + filePath);
+		}
+	}
 }
