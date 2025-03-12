@@ -140,6 +140,27 @@ public class VufindQueryController {
 		}
 	}
 
+	private String buildRecordUrl(String searchUniqueId) {
+		this.log.info("buildRecordUrl for searchUniqueId: " + searchUniqueId);
+		try {
+			String recordUrl = null;
+
+			// Verifica se o 'host' contém 'ibict.br' para gerar a URL com o formato correto
+			if (this.host.contains("ibict.br")) {
+				recordUrl = host + "/record/" + searchUniqueId; // Concatena o host com /record/ + searchUniqueId
+			} else {
+				recordUrl = host + ":" + port + "/record/" + searchUniqueId; // Caso contrário, inclui a porta
+			}
+
+			// Log para mostrar a URL gerada
+			this.log.info("Record URL created: " + recordUrl);
+			return recordUrl;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	private String generetaFileName(String queryString, String type) {
 		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
 		String sufix = queryString + date;
@@ -192,9 +213,13 @@ public class VufindQueryController {
 			if (aggFields == null) {
 				aggFields = new HashMap<>();
 			}
+
+			String serverIp = this.host; 
+
 			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields, listSep, nullMsg,
-					noMsgFields);
+					noMsgFields, serverIp);
 			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+
 		}
 	}
 
@@ -245,6 +270,7 @@ public class VufindQueryController {
 			System.out.println(totalRecords);
 			System.out.println("-------fileName:----------");
 			System.out.println(fileName);
+
 			String outputFile = filePath + fileName;
 			String downloadUrl = buildDownloadUrl(fileName + ".zip");
 

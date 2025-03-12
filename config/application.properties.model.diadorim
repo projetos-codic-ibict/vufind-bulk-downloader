@@ -35,7 +35,8 @@ file.header = {"dc.title":"T\u00edtulo", \
 				"dc.rights.sealcolor": "Selo de armazenamento e acesso", \
 				"dc.rights.time": "Prazo para disponibiliza\u00e7\u00e3o de documentos", \
 				"dc.rights.access": "Tipo de acesso", \
-				"dc.rights.creativecommons": "Licen\u00e7a Creative Commons"}
+				"dc.rights.creativecommons": "Licen\u00e7a Creative Commons",\
+				"search.uniqueid": "URL do Registro "}
 		   
 #Aggregated fields, which gather multiple fields in a single column as a list
 file.agg-fields = {}

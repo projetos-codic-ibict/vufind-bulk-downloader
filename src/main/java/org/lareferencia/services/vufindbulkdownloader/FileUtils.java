@@ -91,7 +91,8 @@ public class FileUtils {
 	// Convert a JSON response into a CSV-ready structure
 	@SuppressWarnings("unchecked")
 	public List<List<String>> JSONtoCSV(String json, Map<String, String> fieldList, List<String> userFields,
-			Map<String, List<String>> aggFields, String listSep, String nullMsg, List<String> noMsgFields) {
+			Map<String, List<String>> aggFields, String listSep, String nullMsg, List<String> noMsgFields,
+			String serverIp) {
 
 		List<List<String>> csv = new ArrayList<List<String>>();
 		Set<String> fields = fieldList.keySet();
@@ -107,8 +108,9 @@ public class FileUtils {
 					header.add(label);
 					columnIndexes.put(label, colIndex++);
 				} else {
-					if (isAggFieldHead(aggFields, field)) { // the first field in an aggregated column, set aggregating field name
-																									// as header
+					if (isAggFieldHead(aggFields, field)) { // the first field in an aggregated column, set aggregating
+															// field name
+															// as header
 						label = getAggFieldName(aggFields, field);
 						header.add(label);
 						columnIndexes.put(label, colIndex++);
@@ -146,7 +148,8 @@ public class FileUtils {
 										toAggregate.put(field, "");
 									}
 								} else {
-									if (!noMsgFields.contains(field)) { // a custom message should be shown instead of a blank
+									if (!noMsgFields.contains(field)) { // a custom message should be shown instead of a
+																		// blank
 										line.set(index, nullMsg);
 									} else {
 										line.set(index, "");
@@ -167,12 +170,35 @@ public class FileUtils {
 										line.set(index, listToString(jsonList, listSep, nullMsg));
 									}
 								} else {
-									if (label.equals("null")) { // single-value field to be aggregated, save for later retrieval
+									if (label.equals("null")) { // single-value field to be aggregated, save for later
+																// retrieval
 										toAggregate.put(field, (String) attribute);
 									} else {
 										line.set(index, (String) attribute);
 									}
 								}
+							}
+						}
+					}
+
+					//  Processando a URL do registro com search.uniqueid
+					//  para retornar no arquivo de exportação a url completa
+					for (String field : fields) {
+						if ("search.uniqueid".equals(field)) { 
+							String idValue = (String) doc.get(field);  
+
+							if (idValue != null) {
+								// Nos ambientes de localhost e teste usar /diadorim na produção usar /vufind 
+								String fullUrl = serverIp + "/diadorim/Record/" + idValue;
+								//String fullUrl = serverIp + "/vufind/Record/" + idValue;
+								int index = columnIndexes.get(fieldList.get(field)); 
+								line.set(index, fullUrl); 
+
+								// Imprime a URL completa no terminal para verificação
+								System.out.println("URL Completa para 'search.uniqueid': " + fullUrl);
+							} else {
+								int index = columnIndexes.get(fieldList.get(field));
+								line.set(index, nullMsg);
 							}
 						}
 					}
@@ -312,7 +338,8 @@ public class FileUtils {
 	 */
 
 	// Write the CSV content to a file
-	public void saveCSVFile(List<List<String>> records, char sep, String outputfile, String encoding, boolean compress) {
+	public void saveCSVFile(List<List<String>> records, char sep, String outputfile, String encoding,
+			boolean compress) {
 
 		try {
 			Charset charset = encoding.equals("UTF-8") ? StandardCharsets.UTF_8 : StandardCharsets.ISO_8859_1;
