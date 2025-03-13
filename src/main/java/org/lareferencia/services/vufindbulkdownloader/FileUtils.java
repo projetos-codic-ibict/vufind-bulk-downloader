@@ -92,7 +92,7 @@ public class FileUtils {
 	@SuppressWarnings("unchecked")
 	public List<List<String>> JSONtoCSV(String json, Map<String, String> fieldList, List<String> userFields,
 			Map<String, List<String>> aggFields, String listSep, String nullMsg, List<String> noMsgFields,
-			String serverIp) {
+			String serverIp, String hostBase) {
 
 		List<List<String>> csv = new ArrayList<List<String>>();
 		Set<String> fields = fieldList.keySet();
@@ -181,21 +181,18 @@ public class FileUtils {
 						}
 					}
 
-					//  Processando a URL do registro com search.uniqueid
 					//  para retornar no arquivo de exportação a url completa
 					for (String field : fields) {
 						if ("search.uniqueid".equals(field)) { 
 							String idValue = (String) doc.get(field);  
 
 							if (idValue != null) {
-								// Nos ambientes de localhost e teste usar /diadorim na produção usar /vufind 
-								String fullUrl = serverIp + "/diadorim/Record/" + idValue;
+								String fullUrl = hostBase + "/Record/" + idValue;
 								//String fullUrl = serverIp + "/vufind/Record/" + idValue;
 								int index = columnIndexes.get(fieldList.get(field)); 
 								line.set(index, fullUrl); 
 
-								// Imprime a URL completa no terminal para verificação
-								System.out.println("URL Completa para 'search.uniqueid': " + fullUrl);
+								//System.out.println("URL Completa para 'search.uniqueid': " + fullUrl);
 							} else {
 								int index = columnIndexes.get(fieldList.get(field));
 								line.set(index, nullMsg);

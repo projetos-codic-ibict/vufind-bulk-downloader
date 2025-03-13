@@ -91,3 +91,5 @@ server.ip = http://localhost
 # Porta para Diadorim
 server.port = 8082
 file.ris={"ty":"format"}
+
+host.base=https://diadorim.ibict.br/vufind

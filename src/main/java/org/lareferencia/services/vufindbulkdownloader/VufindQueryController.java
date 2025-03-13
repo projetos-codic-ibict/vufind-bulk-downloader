@@ -113,6 +113,10 @@ public class VufindQueryController {
 	@Value("${server.ip}")
 	private String host;
 
+
+	@Value("${host.base}")
+	private String hostBase;
+
 	@Value("${server.port}")
 	private String port;
 
@@ -134,27 +138,6 @@ public class VufindQueryController {
 			}
 			this.log.info("fileURL created: " + fileUrl);
 			return fileUrl;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private String buildRecordUrl(String searchUniqueId) {
-		this.log.info("buildRecordUrl for searchUniqueId: " + searchUniqueId);
-		try {
-			String recordUrl = null;
-
-			// Verifica se o 'host' contém 'ibict.br' para gerar a URL com o formato correto
-			if (this.host.contains("ibict.br")) {
-				recordUrl = host + "/record/" + searchUniqueId; // Concatena o host com /record/ + searchUniqueId
-			} else {
-				recordUrl = host + ":" + port + "/record/" + searchUniqueId; // Caso contrário, inclui a porta
-			}
-
-			// Log para mostrar a URL gerada
-			this.log.info("Record URL created: " + recordUrl);
-			return recordUrl;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -217,7 +200,7 @@ public class VufindQueryController {
 			String serverIp = this.host; 
 
 			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields, listSep, nullMsg,
-					noMsgFields, serverIp);
+					noMsgFields, serverIp, hostBase);
 			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
 
 		}
