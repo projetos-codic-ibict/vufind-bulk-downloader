@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
+@PropertySource(value = "file:/home/jesielviana/dev/ibict/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
 public class VufindQueryController {
 
 	Log log = LogFactory.getLog(VufindQueryController.class);
@@ -157,7 +157,7 @@ public class VufindQueryController {
 	}
 
 	// Query Solr to get the data and create a CSV file from it
-	private void createFile(String queryString, String outputFile, String encoding, boolean risOrNot) {
+	private void createFile(String queryString, String outputFile, String encoding, boolean risOrNot, int totalRecords) {
 		StringBuffer content = new StringBuffer();
 
 		try {
@@ -188,15 +188,16 @@ public class VufindQueryController {
 		f.mkdirFilePathDirectoyIfNotExists(filePath);
 		List<String> userFields = getUserFields(queryString);
 		if (risOrNot) {
-			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
-			f.saveRISFile(ris, outputFile, filePath, true);
+			f.JSONtoRIS(fieldListRIS, outputFile, totalRecords, solrServer, queryString, encoding);
+			// f.saveRISFile(ris, outputFile, filePath, true);
 		} else {
 			if (aggFields == null) {
 				aggFields = new HashMap<>();
 			}
-			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields, listSep, nullMsg,
-					noMsgFields);
-			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+			f.JSONtoCSV(fieldList, userFields, aggFields, listSep, nullMsg,
+					noMsgFields, outputFile, totalRecords, solrServer, queryString, encoding, sep);
+			// f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV
+			// file
 		}
 	}
 
@@ -237,7 +238,7 @@ public class VufindQueryController {
 			this.log.info("init executeQuery...");
 			boolean isDownload = Boolean.parseBoolean(download);
 			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
-			// int numRecords = Integer.valueOf(totalRecords);
+			int numRecords = Integer.valueOf(totalRecords);
 
 			String fileName = generetaFileName(queryString, type);
 			if (type.equals("ris")) {
@@ -259,9 +260,9 @@ public class VufindQueryController {
 				// already exist
 				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
 					if (type.equals("ris")) {
-						createFile(queryString, outputFile, encoding, true);
+						createFile(queryString, outputFile, encoding, true, numRecords);
 					} else {
-						createFile(queryString, outputFile, encoding, false);
+						createFile(queryString, outputFile, encoding, false, numRecords);
 					}
 				}
 
@@ -279,9 +280,9 @@ public class VufindQueryController {
 				// Create the CSV file
 				// createFile(queryString, outputFile, encoding);
 				if (type.equals("ris")) {
-					createFile(queryString, outputFile, encoding, true);
+					createFile(queryString, outputFile, encoding, true, numRecords);
 				} else {
-					createFile(queryString, outputFile, encoding, false);
+					createFile(queryString, outputFile, encoding, false, numRecords);
 				}
 
 				// Send download URL by email

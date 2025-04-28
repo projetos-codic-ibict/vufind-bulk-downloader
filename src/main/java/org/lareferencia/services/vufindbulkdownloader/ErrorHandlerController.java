@@ -14,9 +14,4 @@ public class ErrorHandlerController implements ErrorController {
     return "Not found!";
   }
 
-  @Override
-  public String getErrorPath() {
-    return PATH;
-  }
-
 }
