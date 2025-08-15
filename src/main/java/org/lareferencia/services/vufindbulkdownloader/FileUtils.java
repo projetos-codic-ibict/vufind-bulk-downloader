@@ -181,18 +181,22 @@ public class FileUtils {
 						}
 					}
 
-					//  para retornar no arquivo de exportação a url completa
+					// para retornar no arquivo de exportação a url completa
 					for (String field : fields) {
-						if ("search.uniqueid".equals(field)) { 
-							String idValue = (String) doc.get(field);  
+						if ("handleId".equals(field)) {
+							String idValue = (String) doc.get(field);
+							// System.out.println("[LOG] field=" + field);
+							// System.out.println("[LOG] idValue=" + idValue);
+							// System.out.println("[LOG] hostBase=" + hostBase);
+							// System.out.println("[LOG] fieldList.get(field)=" + fieldList.get(field));
+							// System.out.println("[LOG] columnIndexes.get(...)=" + columnIndexes.get(fieldList.get(field)));
 
 							if (idValue != null) {
 								String fullUrl = hostBase + "/Record/" + idValue;
-								//String fullUrl = serverIp + "/vufind/Record/" + idValue;
-								int index = columnIndexes.get(fieldList.get(field)); 
-								line.set(index, fullUrl); 
-
-								//System.out.println("URL Completa para 'search.uniqueid': " + fullUrl);
+								// String fullUrl = serverIp + "/vufind/Record/" + idValue;
+								int index = columnIndexes.get(fieldList.get(field));
+								line.set(index, fullUrl);
+								// System.out.println("[LOG] fullUrl=" + fullUrl);
 							} else {
 								int index = columnIndexes.get(fieldList.get(field));
 								line.set(index, nullMsg);
