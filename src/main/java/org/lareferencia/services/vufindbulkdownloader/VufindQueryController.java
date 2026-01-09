@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,291 +32,323 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PropertySource(value = "file:/usr/local/vufind-bulk-downloader/config/application.properties", encoding = "UTF-8")
+@PropertySource("classpath:application.properties")
 public class VufindQueryController {
 
-	Log log = LogFactory.getLog(VufindQueryController.class);
+    Log log = LogFactory.getLog(VufindQueryController.class);
 
-	@Value("${query.solr-server}")
-	private String solrServer;
+    @Value("${query.solr-server}")
+    private String solrServer;
 
-	@Value("${file.path}")
-	private String filePath;
+    @Value("${file.path}")
+    private String filePath;
 
-	@Value("${file.sep-char}")
-	private char sep;
+    @Value("${file.sep-char}")
+    private char sep;
 
-	@Value("${file.list-sep}")
-	private String listSep;
+    @Value("${file.list-sep}")
+    private String listSep;
 
-	@Value("#{${file.header}}")
-	private Map<String, String> fieldList;
+    @Value("#{${file.header}}")
+    private Map<String, String> fieldList;
 
-	@Value("#{${file.ris}}")
-	private Map<String, String> fieldListRIS;
+    @Value("#{${file.ris}}")
+    private Map<String, String> fieldListRIS;
 
-	@Value("#{${file.agg-fields}}")
-	private Map<String, List<String>> aggFields;
+    @Value("#{${file.agg-fields}}")
+    private Map<String, List<String>> aggFields;
 
-	@Value("${file.null-msg}")
-	private String nullMsg;
+    @Value("${file.null-msg}")
+    private String nullMsg;
 
-	@Value("${file.no-msg-fields}")
-	private List<String> noMsgFields;
+    @Value("${file.no-msg-fields}")
+    private List<String> noMsgFields;
 
-	@Value("${smtp.host}")
-	private String smtpHost;
+    @Value("${smtp.host}")
+    private String smtpHost;
 
-	@Value("${smtp.port}")
-	private String smtpPort;
+    @Value("${smtp.port}")
+    private String smtpPort;
 
-	@Value("${mail.sender}")
-	private String sender;
+    @Value("${mail.sender}")
+    private String sender;
 
-	@Value("${mail.sender-pwd}")
-	private String pwd;
+    @Value("${mail.sender-pwd}")
+    private String pwd;
 
-	@Value("${mail.confirm-subject}")
-	private String confSubject;
+    @Value("${mail.confirm-subject}")
+    private String confSubject;
 
-	@Value("${mail.ready-msg}")
-	private String readyMsg;
+    @Value("${mail.ready-msg}")
+    private String readyMsg;
 
-	@Value("${mail.wait-msg-top}")
-	private String waitMsgTop;
+    @Value("${mail.wait-msg-top}")
+    private String waitMsgTop;
 
-	// @Value("${mail.wait-mg-bottom}")
-	// private String waitMsgBottom;
+    // @Value("${mail.wait-mg-bottom}")
+    // private String waitMsgBottom;
 
-	@Value("${mail.link-subject}")
-	private String linkSubject;
+    @Value("${mail.link-subject}")
+    private String linkSubject;
 
-	@Value("${mail.link-msg-top}")
-	private String linkMsgTop;
+    @Value("${mail.link-msg-top}")
+    private String linkMsgTop;
 
-	@Value("${mail.link-msg-bottom}")
-	private String linkMsgBottom;
+    @Value("${mail.link-msg-bottom}")
+    private String linkMsgBottom;
 
-	@Value("${time.short-record}")
-	private Double shortRecTime;
+    @Value("${time.short-record}")
+    private Double shortRecTime;
 
-	@Value("${time.long-record}")
-	private Double longRecTime;
+    @Value("${time.long-record}")
+    private Double longRecTime;
 
-	@Value("${time.server-delay}")
-	private Double delay;
+    @Value("${time.server-delay}")
+    private Double delay;
 
-	@Value("#{${time.units}}")
-	private Map<String, String> timeUnits;
+    @Value("#{${time.units}}")
+    private Map<String, String> timeUnits;
 
-	@Value("${server.ip}")
-	private String host;
+    @Value("${server.ip}")
+    private String host;
 
-	@Value("${server.port}")
-	private String port;
+    @Value("${server.port}")
+    private String port;
 
-	// Build the Solr query URL
-	private String buildQueryUrl(String queryString) {
+    // Build the Solr query URL
+    private String buildQueryUrl(String queryString) {
+        return solrServer + "/select?" + queryString;
+    }
 
-		return solrServer + "/select?" + queryString;
-	}
+    // Build the URL for downloading the generated CSV file
+    private String buildDownloadUrl(String fileName) {
+        this.log.info("buildDownloadUrl to fileName: " + fileName);
+        try {
+            String fileUrl = null;
+            if (this.host.contains("ibict.br")) {
+                fileUrl = host + "/query/download?fileName=" + fileName;
+            } else {
+                fileUrl =
+                    host + ":" + port + "/query/download?fileName=" + fileName;
+            }
+            this.log.info("fileURL created: " + fileUrl);
+            return fileUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-	// Build the URL for downloading the generated CSV file
-	private String buildDownloadUrl(String fileName) {
-		this.log.info("buildDownloadUrl to fileName: " + fileName);
-		try {
-			String fileUrl = null;
-			if (this.host.contains("ibict.br")) {
-				fileUrl = host + "/query/download?fileName=" + fileName;
-			} else {
-				fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
-			}
-			this.log.info("fileURL created: " + fileUrl);
-			return fileUrl;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+    private String generetaFileName(String queryString, String type) {
+        String date = ZonedDateTime.now(ZoneId.systemDefault()).format(
+            DateTimeFormatter.ofPattern("uuuuMMdd")
+        );
+        String sufix = queryString + date;
+        return "search_result-" + String.valueOf(sufix.hashCode()) + "-" + type;
+    }
 
-	private String generetaFileName(String queryString, String type) {
-		String date = ZonedDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("uuuuMMdd"));
-		String sufix = queryString + date;
-		return "search_result-" + String.valueOf(sufix.hashCode()) + "-" + type;
-	}
+    // Get the list of fields selected by the user for export
+    private List<String> getUserFields(String queryString) {
+        List<String> fields = new ArrayList<String>();
 
-	// Get the list of fields selected by the user for export
-	private List<String> getUserFields(String queryString) {
-		List<String> fields = new ArrayList<String>();
+        int listStart = queryString.lastIndexOf("&fl=") + 4;
+        String list = queryString.substring(
+            listStart,
+            queryString.indexOf('&', listStart)
+        );
+        fields = Stream.of(list.split(",")).collect(Collectors.toList());
+        return fields;
+    }
 
-		int listStart = queryString.lastIndexOf("&fl=") + 4;
-		String list = queryString.substring(listStart, queryString.indexOf('&', listStart));
-		fields = Stream.of(list.split(",")).collect(Collectors.toList());
-		return fields;
-	}
+    // Query Solr to get the data and create a CSV file from it
+    private void createFile(
+        String queryString,
+        String outputFile,
+        String encoding,
+        boolean risOrNot
+    ) {
+        StringBuffer content = new StringBuffer();
 
-	// Query Solr to get the data and create a CSV file from it
-	private void createFile(String queryString, String outputFile, String encoding, boolean risOrNot) {
-		StringBuffer content = new StringBuffer();
+        try {
+            // URL url = URI.create(buildQueryUrl(queryString)).toURL();
+            URL url = new URL(buildQueryUrl(queryString));
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
 
-		try {
-			// URL url = URI.create(buildQueryUrl(queryString)).toURL();
-			URL url = new URL(buildQueryUrl(queryString));
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(
+                    con.getInputStream(),
+                    StandardCharsets.UTF_8
+                )
+            );
+            String inputLine;
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
-			String inputLine;
+            // Read the response
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
 
-			// Read the response
-			while ((inputLine = in.readLine()) != null) {
-				content.append(inputLine);
-			}
+            in.close();
+            con.disconnect();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-			in.close();
-			con.disconnect();
+        // Convert to CSV and save to compressed file
+        FileUtils f = new FileUtils();
+        f.mkdirFilePathDirectoyIfNotExists(filePath);
+        List<String> userFields = getUserFields(queryString);
+        if (risOrNot) {
+            String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
+            f.saveRISFile(ris, outputFile, filePath, true);
+        } else {
+            if (aggFields == null) {
+                aggFields = new HashMap<>();
+            }
+            List<List<String>> csv = f.JSONtoCSV(
+                content.toString(),
+                fieldList,
+                userFields,
+                aggFields,
+                listSep,
+                nullMsg,
+                noMsgFields
+            );
+            f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
+        }
+    }
 
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    @RequestMapping("/existFile")
+    public boolean fileExists(
+        @RequestParam(required = true) String queryString,
+        @RequestParam(required = true) String type
+    ) {
+        System.out.println(type);
+        System.out.println("entrou no existsFile");
+        String fileName = generetaFileName(queryString, type);
+        String outputFile = filePath + fileName;
+        System.out.println("-------------");
+        System.out.println(outputFile);
 
-		// Convert to CSV and save to compressed file
-		FileUtils f = new FileUtils();
-		f.mkdirFilePathDirectoyIfNotExists(filePath);
-		List<String> userFields = getUserFields(queryString);
-		if (risOrNot) {
-			String ris = f.JSONtoRIS(content.toString(), fieldListRIS);
-			f.saveRISFile(ris, outputFile, filePath, true);
-		} else {
-			if (aggFields == null) {
-				aggFields = new HashMap<>();
-			}
-			List<List<String>> csv = f.JSONtoCSV(content.toString(), fieldList, userFields, aggFields, listSep, nullMsg,
-					noMsgFields);
-			f.saveCSVFile(csv, sep, outputFile, encoding, true); // always compress CSV file
-		}
-	}
+        if (Files.exists(Paths.get(outputFile + ".zip"))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	@RequestMapping("/existFile")
-	public boolean fileExists(@RequestParam(required = true) String queryString,
-			@RequestParam(required = true) String type) {
-		System.out.println(type);
-		System.out.println("entrou no existsFile");
-		String fileName = generetaFileName(queryString, type);
-		String outputFile = filePath + fileName;
-		System.out.println("-------------");
-		System.out.println(outputFile);
+    @RequestMapping("/")
+    public String home() {
+        return "Service is online!";
+    }
 
-		if (Files.exists(Paths.get(outputFile + ".zip"))) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    @RequestMapping("/query")
+    public String executeQuery(
+        @RequestParam(required = true) String queryString,
+        @RequestParam(required = true) String download,
+        @RequestParam(required = true) String totalRecords,
+        @RequestParam(required = true) String hasAbstract,
+        @RequestParam(required = true) String encoding,
+        @RequestParam(required = true) String userEmail,
+        @RequestParam(required = true) String type
+    ) {
+        try {
+            System.out.println("--------type---------");
+            System.out.println(type);
+            this.log.info("init executeQuery...");
+            boolean isDownload = Boolean.parseBoolean(download);
+            // boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
+            // int numRecords = Integer.valueOf(totalRecords);
 
-	@RequestMapping("/")
-	public String home() {
-		return "Service is online!";
-	}
+            String fileName = generetaFileName(queryString, type);
+            if (type.equals("ris")) {
+                System.out.println(fileName);
+            }
+            System.out.println("---totalRecord----");
+            System.out.println(totalRecords);
+            System.out.println("-------fileName:----------");
+            System.out.println(fileName);
+            String outputFile = filePath + fileName;
+            String downloadUrl = buildDownloadUrl(fileName + ".zip");
 
-	@RequestMapping("/query")
-	public String executeQuery(@RequestParam(required = true) String queryString,
-			@RequestParam(required = true) String download,
-			@RequestParam(required = true) String totalRecords,
-			@RequestParam(required = true) String hasAbstract,
-			@RequestParam(required = true) String encoding,
-			@RequestParam(required = true) String userEmail,
-			@RequestParam(required = true) String type) {
-		try {
+            Mailer mailer = new Mailer(smtpHost, smtpPort, sender, pwd);
 
-			System.out.println("--------type---------");
-			System.out.println(type);
-			this.log.info("init executeQuery...");
-			boolean isDownload = Boolean.parseBoolean(download);
-			// boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
-			// int numRecords = Integer.valueOf(totalRecords);
+            if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
+                // User will be able to download the file immediately
 
-			String fileName = generetaFileName(queryString, type);
-			if (type.equals("ris")) {
-				System.out.println(fileName);
-			}
-			System.out.println("---totalRecord----");
-			System.out.println(totalRecords);
-			System.out.println("-------fileName:----------");
-			System.out.println(fileName);
-			String outputFile = filePath + fileName;
-			String downloadUrl = buildDownloadUrl(fileName + ".zip");
+                // Only creates the CSV file if a file created from the same query does not
+                // already exist
+                if (Files.notExists(Paths.get(outputFile + ".zip"))) {
+                    if (type.equals("ris")) {
+                        createFile(queryString, outputFile, encoding, true);
+                    } else {
+                        createFile(queryString, outputFile, encoding, false);
+                    }
+                }
 
-			Mailer mailer = new Mailer(smtpHost, smtpPort, sender, pwd);
+                // Send a confirmation email
+                mailer.sendMail(sender, userEmail, confSubject, readyMsg);
+                this.log.info(
+                    "downloadUrl created for direct download: " + downloadUrl
+                );
+                return downloadUrl;
+            } else {
+                // Download URL will be sent to user by email later
+                this.log.info(
+                    "downloadUrl will be sent to user by email later"
+                );
+                // First send an email acknowledging the request was received
+                String waitMsg = waitMsgTop;
+                mailer.sendMail(sender, userEmail, confSubject, waitMsg);
 
-			if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
-				// User will be able to download the file immediately
+                // Create the CSV file
+                // createFile(queryString, outputFile, encoding);
+                if (type.equals("ris")) {
+                    createFile(queryString, outputFile, encoding, true);
+                } else {
+                    createFile(queryString, outputFile, encoding, false);
+                }
 
-				// Only creates the CSV file if a file created from the same query does not
-				// already exist
-				if (Files.notExists(Paths.get(outputFile + ".zip"))) {
-					if (type.equals("ris")) {
-						createFile(queryString, outputFile, encoding, true);
-					} else {
-						createFile(queryString, outputFile, encoding, false);
-					}
-				}
+                // Send download URL by email
+                String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
+                mailer.sendMail(sender, userEmail, linkSubject, linkMsg);
 
-				// Send a confirmation email
-				mailer.sendMail(sender, userEmail, confSubject, readyMsg);
-				this.log.info("downloadUrl created for direct download: " + downloadUrl);
-				return downloadUrl;
-			} else {
-				// Download URL will be sent to user by email later
-				this.log.info("downloadUrl will be sent to user by email later");
-				// First send an email acknowledging the request was received
-				String waitMsg = waitMsgTop;
-				mailer.sendMail(sender, userEmail, confSubject, waitMsg);
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-				// Create the CSV file
-				// createFile(queryString, outputFile, encoding);
-				if (type.equals("ris")) {
-					createFile(queryString, outputFile, encoding, true);
-				} else {
-					createFile(queryString, outputFile, encoding, false);
-				}
+    @RequestMapping("/query/download")
+    public ResponseEntity<FileSystemResource> downloadFile(
+        @RequestParam(required = true) String fileName
+    ) throws IOException {
+        this.log.info("entrando na função");
+        this.log.info(fileName);
+        this.log.info("init downloadFile...");
+        File file = new File(filePath + fileName);
+        FileSystemResource resource = new FileSystemResource(file);
 
-				// Send download URL by email
-				String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
-				mailer.sendMail(sender, userEmail, linkSubject, linkMsg);
+        return ResponseEntity.ok()
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=" + file.getName()
+            )
+            .contentType(MediaType.parseMediaType("application/zip"))
+            .contentLength(file.length())
+            .body(resource);
+    }
 
-				return null;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	@RequestMapping("/query/download")
-	public ResponseEntity<FileSystemResource> downloadFile(
-			@RequestParam(required = true) String fileName) throws IOException {
-		this.log.info("entrando na função");
-		this.log.info(fileName);
-		this.log.info("init downloadFile...");
-		File file = new File(filePath + fileName);
-		FileSystemResource resource = new FileSystemResource(file);
-
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-				.contentType(MediaType.parseMediaType("application/zip")).contentLength(file.length())
-				.body(resource);
-	}
-
-	@RequestMapping("/memory-status")
-	public MemoryStats getMemoryStatistics() {
-		MemoryStats stats = new MemoryStats();
-		stats.setHeapSize(Runtime.getRuntime().totalMemory());
-		stats.setHeapMaxSize(Runtime.getRuntime().maxMemory());
-		stats.setHeapFreeSize(Runtime.getRuntime().freeMemory());
-		return stats;
-	}
-
+    @RequestMapping("/memory-status")
+    public MemoryStats getMemoryStatistics() {
+        MemoryStats stats = new MemoryStats();
+        stats.setHeapSize(Runtime.getRuntime().totalMemory());
+        stats.setHeapMaxSize(Runtime.getRuntime().maxMemory());
+        stats.setHeapFreeSize(Runtime.getRuntime().freeMemory());
+        return stats;
+    }
 }

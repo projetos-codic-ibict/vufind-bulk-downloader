@@ -18,7 +18,7 @@ $ ./build.sh
 
 3. Edit config files
 
-> - config/application.properties (first make a copy from config/application.properties.model)
+> - src/main/resources/application.properties (first make a copy from src/main/resources/application.properties.model)
 
 > - bullk-downloader.conf
 
