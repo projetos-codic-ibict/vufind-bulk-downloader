@@ -10,17 +10,17 @@ Service, templates, controllers, and forms for customizing VuFind so the search 
 
 1. Clone/download this repository
 
-2. Build using Maven/Java8
-
-```
-$ ./build.sh
-```
-
-3. Edit config files
+2. Edit config files
 
 > - src/main/resources/application.properties (first make a copy from src/main/resources/application.properties.model)
 
 > - bullk-downloader.conf
+
+3. Build using Maven/Java
+
+```
+$ ./build.sh
+```
 
 ### Run
 
