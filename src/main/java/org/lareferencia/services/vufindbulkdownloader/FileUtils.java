@@ -19,13 +19,13 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.opencsv.CSVWriter;
+
 import org.apache.commons.collections.list.FixedSizeList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import com.opencsv.CSVWriter;
 
 public class FileUtils {
 
@@ -179,6 +179,9 @@ public class FileUtils {
 
 					// Process aggregated fields
 					for (String aggField : aggFields.keySet()) {
+						if (!columnIndexes.containsKey(aggField)) {
+							continue;
+						}
 						int index = columnIndexes.get(aggField);
 						List<String> items = new ArrayList<String>();
 

@@ -1,7 +1,7 @@
 ##Solr query properties##
 
 #Server address
-query.solr-server = <URL>
+query.solr-server =  https://host-solr/solr/biblio
 
 ##CSV file properties##
 
@@ -11,8 +11,8 @@ file.path = /tmp/vufind-bulk-downloader/
 file.sep-char = ,
 #Symbol used to separate values in multiple-value fields
 file.list-sep = ||
-#CSV column headers. This list of fields must be synchronized with the list of 
-#fields available for export defined in VuFind. If fields are to be aggregated 
+#CSV column headers. This list of fields must be synchronized with the list of
+#fields available for export defined in VuFind. If fields are to be aggregated
 #in a single column, the header must be set to "null", and the new column header
 #defined in the 'file.agg-fields' property below
 file.header = {"title":"T\u00edtulo do documento", \
@@ -60,7 +60,7 @@ file.header = {"title":"T\u00edtulo do documento", \
 				"id":"ID no Oasisbr", \
 				"oai_identifier_str":"Link OAI do registro", \
 				"dc.identifier.citation.fl_str_mv":"Refer\u00eancia"}
-		   
+
 #Aggregated fields, which gather multiple fields in a single column as a list
 file.agg-fields = {"Orientadores":"dc.contributor.advisor1.fl_str_mv,dc.contributor.advisor2.fl_str_mv", \
                    "ID Lattes dos orientadores":"dc.contributor.advisor1Lattes.fl_str_mv,dc.contributor.advisor2Lattes.fl_str_mv", \
@@ -83,17 +83,17 @@ mail.sender = <email>
 mail.sender-pwd = <pass-email>
 #Email subject for the confirmation e-mails
 mail.confirm-subject = Exporta\u00e7\u00e3o de busca no Oasisbr
-#Confirmation message sent when the file was immediately downloaded. Some HTML is fine (mail 
+#Confirmation message sent when the file was immediately downloaded. Some HTML is fine (mail
 #content type is set to 'text/html')
 mail.ready-msg = Prezado usu\u00e1rio,<br><br>Seu arquivo CSV foi criado com \u00eaxito.<br><br>Atenciosamente,<br>Equipe Oasisbr.
-#Confirmation message sent when the export was requested but the number of records is too large, 
-#so the download link will be sent later in another email. It is split into two parts so the file   
+#Confirmation message sent when the export was requested but the number of records is too large,
+#so the download link will be sent later in another email. It is split into two parts so the file
 #creation time estimate can be inserted between them in the mail body. Some HTML is fine
 mail.wait-msg-top = Prezado usu\u00e1rio,<br><br>Sua solicita\u00e7\u00e3o de exporta\u00e7\u00e3o foi recebida e o arquivo CSV est\u00e1 sendo criado. Devido \u00e0 quantidade de registros, o arquivo dever\u00e1 levar alguns minutos para ficar pronto. Voc\u00ea receber\u00e1 outro e-mail com o link para download quando estiver conclu\u00eddo.<br><br>Atenciosamente,<br>Equipe Oasisbr.
 mail.wait-mg-bottom = para ficar pronto. Voc\u00ea receber\u00e1 outro e-mail com o link para download quando estiver conclu\u00eddo.<br><br>Atenciosamente,<br>Equipe Oasisbr.
 #Email subject for the download link email
 mail.link-subject = Download do arquivo CSV
-#Download link email message. It is split into two parts so the download link can be inserted  
+#Download link email message. It is split into two parts so the download link can be inserted
 #between them in the mail body. Some HTML is fine
 mail.link-msg-top = Prezado usu\u00e1rio,<br><br>Seu arquivo CSV est\u00e1 pronto e pode ser baixado atrav\u00e9s do link
 mail.link-msg-bottom = <br><br>O arquivo ficar\u00e1 dispon\u00edvel para download por 24 horas.<br><br>Atenciosamente,<br>Equipe Oasisbr.
