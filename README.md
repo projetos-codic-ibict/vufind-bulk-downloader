@@ -51,15 +51,15 @@ In the `vufind` folder:
 2. Theme folder `custom_theme`
 
 - In case there is no custom theme:
-	- Copy the whole folder to `<VUFIND_HOME>\themes` (the folder name, which is the new theme name, can be changed)
+	- Create a new theme: [command line to create a new theme](https://vufind.org/wiki/development:code_generators#creating_themes)
 	- In the `config.ini` file (at `<VUFIND_HOME>\config\vufind`), change the `theme` entry to match the new theme name (the theme folder name)
-	
-- In case there is a custom theme already in use:
-	- If there are no custom templates, copy the whole `templates` folder to the theme folder
-	- If there are already custom templates:
-		- Copy the whole `bulkexport` folder to the `templates` folder
-		- Copy the whole `search` folder to the `templates` folder if it still does not exist, or copy only the `results.phtml` template file (under `search`)  to the existing local `search` folder otherwise
-			- If the `results.phtml` template is already customized, only the lines 131--133, which include the "Export CSV" link, can be inserted in the existing customized template as desired, as long as the `href` attribute is not changed
+  - Copy the whole `bulkexport` folder to the `templates` folder
+  - Copy the `search/results.phtml` of base theme to the `templates` of `custom_theme` folder and copy the content of `search/results.phtml`, which include the "Export CSV" link, can be inserted in the existing customized template as desired.
+
+- If there are already custom templates:
+  - Copy the whole `bulkexport` folder to the `templates` folder
+  - If the `results.phtml` template is already customized, copy the content of `search/results.phtml`, which include the "Export CSV" link, can be inserted in the existing customized template as desired.
+  - If `search/results.phtml` still does not exist, copy the `search/results.phtml` of base theme to the `templates` of `custom_theme` folder and copy the content of `search/results.phtml`, which include the "Export CSV" link, can be inserted in the existing customized template as desired.
 		
 3. Module folder `CustomModule`
 
