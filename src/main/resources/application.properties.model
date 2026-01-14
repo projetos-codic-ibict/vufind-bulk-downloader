@@ -35,14 +35,13 @@ file.null-msg = N\u00e3o informado pela institui\u00e7\u00e3o
 file.no-msg-fields = dc.contributor.co.fl_str_mv
 
 ##Email properties##
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=jesiel.analista@gmail.com
+spring.mail.password=koxi lmka bmou ficj
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
 
-#SMTP server
-smtp.host = smtp.gmail.com
-smtp.port = 587
-#Email sender address which will appear in the 'From:' and 'Reply-to:' fields in the e-mails
-#sent to users. Also used for SMTP server authentication
-mail.sender = <email>
-mail.sender-pwd = <pass-email>
 #Email subject for the confirmation e-mails
 mail.confirm-subject = Exporta\u00e7\u00e3o de busca no [AppName]
 #Confirmation message sent when the file was immediately downloaded. Some HTML is fine (mail

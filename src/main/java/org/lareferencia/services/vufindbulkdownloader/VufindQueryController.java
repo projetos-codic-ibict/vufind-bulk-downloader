@@ -66,18 +66,6 @@ public class VufindQueryController {
     @Value("${file.no-msg-fields}")
     private List<String> noMsgFields;
 
-    @Value("${smtp.host}")
-    private String smtpHost;
-
-    @Value("${smtp.port}")
-    private String smtpPort;
-
-    @Value("${mail.sender}")
-    private String sender;
-
-    @Value("${mail.sender-pwd}")
-    private String pwd;
-
     @Value("${mail.confirm-subject}")
     private String confSubject;
 
@@ -86,9 +74,6 @@ public class VufindQueryController {
 
     @Value("${mail.wait-msg-top}")
     private String waitMsgTop;
-
-    // @Value("${mail.wait-mg-bottom}")
-    // private String waitMsgBottom;
 
     @Value("${mail.link-subject}")
     private String linkSubject;
@@ -269,8 +254,6 @@ public class VufindQueryController {
             String outputFile = filePath + fileName;
             String downloadUrl = buildDownloadUrl(fileName + ".zip");
 
-            // Mailer mailer = new Mailer(smtpHost, smtpPort, sender, pwd);
-
             if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
                 // User will be able to download the file immediately
 
@@ -285,7 +268,6 @@ public class VufindQueryController {
                 }
 
                 // Send a confirmation email
-                // mailer.sendMail(sender, userEmail, confSubject, readyMsg);
                 emailService.sendHtmlEmail(userEmail, confSubject, readyMsg);
                 this.log.info(
                         "downloadUrl created for direct download: " + downloadUrl);
@@ -296,7 +278,6 @@ public class VufindQueryController {
                         "downloadUrl will be sent to user by email later");
                 // First send an email acknowledging the request was received
                 String waitMsg = waitMsgTop;
-                // mailer.sendMail(sender, userEmail, confSubject, waitMsg);
                 emailService.sendHtmlEmail(userEmail, confSubject, waitMsg);
 
                 // Create the CSV file
@@ -309,7 +290,6 @@ public class VufindQueryController {
 
                 // Send download URL by email
                 String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
-                // mailer.sendMail(sender, userEmail, linkSubject, linkMsg);
                 emailService.sendHtmlEmail(userEmail, linkSubject, linkMsg);
 
                 return null;
