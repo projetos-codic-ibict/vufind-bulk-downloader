@@ -255,10 +255,6 @@ public class VufindQueryController {
             String downloadUrl = buildDownloadUrl(fileName + ".zip");
 
             if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
-                // User will be able to download the file immediately
-
-                // Only creates the CSV file if a file created from the same query does not
-                // already exist
                 if (Files.notExists(Paths.get(outputFile + ".zip"))) {
                     if (type.equals("ris")) {
                         createFile(queryString, outputFile, encoding, true);
@@ -267,29 +263,26 @@ public class VufindQueryController {
                     }
                 }
 
-                // Send a confirmation email
-                emailService.sendHtmlEmail(userEmail, confSubject, readyMsg);
-                this.log.info(
-                        "downloadUrl created for direct download: " + downloadUrl);
+                try {
+                    emailService.sendHtmlEmail(userEmail, confSubject, readyMsg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                this.log.info("downloadUrl created for direct download: " + downloadUrl);
                 return downloadUrl;
             } else {
-                // Download URL will be sent to user by email later
-                this.log.info(
-                        "downloadUrl will be sent to user by email later");
-                // First send an email acknowledging the request was received
+                this.log.info("downloadUrl will be sent to user by email later");
                 String waitMsg = waitMsgTop;
                 emailService.sendHtmlEmail(userEmail, confSubject, waitMsg);
 
-                // Create the CSV file
-                // createFile(queryString, outputFile, encoding);
                 if (type.equals("ris")) {
                     createFile(queryString, outputFile, encoding, true);
                 } else {
                     createFile(queryString, outputFile, encoding, false);
                 }
 
-                // Send download URL by email
                 String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
+                this.log.info("Sending an email containing a link to download the file.");
                 emailService.sendHtmlEmail(userEmail, linkSubject, linkMsg);
 
                 return null;
