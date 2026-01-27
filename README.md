@@ -33,7 +33,7 @@ $ java -jar bulk-downloader.jar
 - Run as service
 
 ```
-$ sudo ln -s /path/to/vufind-bulk-downloader/ /etc/init.d/bulk-downloader
+$ sudo ln -s /path/to/vufind-bulk-downloader/bulk-downloader.jar /etc/init.d/bulk-downloader
 $ sudo /etc/init.d/bulk-downloader start
 ``` 
 
