@@ -27,7 +27,7 @@ $ ./build.sh
 - Run from bash
 
 ```
-$ ./bulk-downloader.jar
+$ java -jar bulk-downloader.jar
 ```
 
 - Run as service
