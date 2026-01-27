@@ -1,6 +1,6 @@
 <?php
 
-class ExecuteBulkExport
+class ExecuteBulkExportBackground
 {
     protected $email;
     protected $serviceUrl;
@@ -56,7 +56,7 @@ class ExecuteBulkExport
     }
 }
 
-$obj = new ExecuteBulkExport($argv[1]);
+$obj = new ExecuteBulkExportBackground($argv[1]);
 $obj->execute();
 
 ?>

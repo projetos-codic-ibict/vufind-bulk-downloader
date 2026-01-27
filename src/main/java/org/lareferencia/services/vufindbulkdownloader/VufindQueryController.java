@@ -207,16 +207,14 @@ public class VufindQueryController {
     public boolean fileExists(
             @RequestParam(required = true) String queryString,
             @RequestParam(required = true) String type) {
-        System.out.println(type);
-        System.out.println("entrou no existsFile");
         String fileName = generetaFileName(queryString, type);
         String outputFile = filePath + fileName;
-        System.out.println("-------------");
-        System.out.println(outputFile);
 
         if (Files.exists(Paths.get(outputFile + ".zip"))) {
+            this.log.info("existFile true");
             return true;
         } else {
+            this.log.info("existFile false");
             return false;
         }
     }
@@ -236,21 +234,12 @@ public class VufindQueryController {
             @RequestParam(required = true) String userEmail,
             @RequestParam(required = true) String type) {
         try {
-            System.out.println("--------type---------");
-            System.out.println(type);
             this.log.info("init executeQuery...");
             boolean isDownload = Boolean.parseBoolean(download);
             // boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
             // int numRecords = Integer.valueOf(totalRecords);
 
             String fileName = generetaFileName(queryString, type);
-            if (type.equals("ris")) {
-                System.out.println(fileName);
-            }
-            System.out.println("---totalRecord----");
-            System.out.println(totalRecords);
-            System.out.println("-------fileName:----------");
-            System.out.println(fileName);
             String outputFile = filePath + fileName;
             String downloadUrl = buildDownloadUrl(fileName + ".zip");
 
@@ -264,14 +253,19 @@ public class VufindQueryController {
                 }
 
                 try {
-                    emailService.sendHtmlEmail(userEmail, confSubject, readyMsg);
+                    emailService.sendHtmlEmail(
+                            userEmail,
+                            confSubject,
+                            readyMsg);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                this.log.info("downloadUrl created for direct download: " + downloadUrl);
+                this.log.info(
+                        "downloadUrl created for direct download: " + downloadUrl);
                 return downloadUrl;
             } else {
-                this.log.info("downloadUrl will be sent to user by email later");
+                this.log.info(
+                        "downloadUrl will be sent to user by email later");
                 String waitMsg = waitMsgTop;
                 emailService.sendHtmlEmail(userEmail, confSubject, waitMsg);
 
@@ -282,7 +276,8 @@ public class VufindQueryController {
                 }
 
                 String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
-                this.log.info("Sending an email containing a link to download the file.");
+                this.log.info(
+                        "Sending an email containing a link to download the file.");
                 emailService.sendHtmlEmail(userEmail, linkSubject, linkMsg);
 
                 return null;

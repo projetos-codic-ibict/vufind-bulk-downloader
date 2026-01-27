@@ -72,7 +72,7 @@ In the `vufind` folder:
 	
 - Copy the `BulkExportConfirm.php` class to `<VUFIND_HOME>\module\<CUSTOM_MODULE>\src\<CUSTOM_MODULE>`, and edit the file to replace `CustomModule` with your own custom module name in the namespace (line 3)
 
-- Copy the `ExecuteBulkExport.php` class to `<VUFIND_HOME>\module\<CUSTOM_MODULE>\src\<CUSTOM_MODULE>`. This is the class which will be called in background to perform the export, so be sure to inform its full path in the `bulkexport.ini` file (see above), in the `backgroundClass` entry
+- Copy the `ExecuteBulkExportBackground.php` class to `<VUFIND_HOME>\module\<CUSTOM_MODULE>\src\<CUSTOM_MODULE>`. This is the class which will be called in background to perform the export, so be sure to inform its full path in the `bulkexport.ini` file (see above), in the `backgroundClass` entry
 
 
 4. Language files in the `languages` folder
