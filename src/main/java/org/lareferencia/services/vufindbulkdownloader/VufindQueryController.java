@@ -96,7 +96,7 @@ public class VufindQueryController {
     @Value("#{${time.units}}")
     private Map<String, String> timeUnits;
 
-    @Value("${server.ip}")
+    @Value("${server.host}")
     private String host;
 
     @Value("${server.port}")
