@@ -150,8 +150,9 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
             );
             $queryLimit = $exportConfig->Query->rows;
             $totalRecords = intval($totalRecords);
-            $totalRecords =
-                $totalRecords < $queryLimit ? $totalRecords : $queryLimit;
+            if ($fileExists === null) {
+                return $this->serviceOfflineResponse();
+            }
 
             if ($totalRecords <= $maxTotal or $fileExists == 'true') {
                 // Immediate file download
@@ -164,6 +165,11 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
                     $encoding,
                     $email,
                 );
+
+                if ($response === null) {
+                    return $this->serviceOfflineResponse();
+                }
+
                 // After export file is ready, show download window
                 $downloadUrl =
                     $serverUrlHelper($urlHelper('bulkexport-download')) .
@@ -471,6 +477,19 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
         } catch (Exception $ex) {
             sprintf('Unexpected exception.');
         }
+    }
+
+    protected function serviceOfflineResponse()
+    {
+        $msg = [
+            'translate' => false,
+            'html' => true,
+            'msg' => $this->getViewRenderer()->render(
+                'bulkexport/service-offline.phtml',
+            ),
+        ];
+        $this->flashMessenger()->addMessage($msg, 'error');
+        return $this->createViewModel();
     }
 
     protected function createClient($url, $method)
