@@ -1,84 +1,84 @@
-# Vufind Search Results Bulk Downloader Service and Front-End Customization
+# VuFind Search Results Bulk Downloader
 
-Service, templates, controllers, and forms for customizing VuFind so the search results can be exported in CSV format. An "Export CSV" link is added to the search results page, opening a form where the user can select fields to be exported, inform their email address and provide a captcha-based form validation. The actual CSV file creation is performed by the external service, which is called by VuFind and can, based on a download limit parameter, either return the file for download or send the file download link to the user by email.
+A comprehensive solution for exporting VuFind search results into CSV or RIS format. This component includes a Java-based backend service for processing large exports and a VuFind module/theme customization for the frontend integration.
+
+---
+
+## Prerequisites
+- **Java**: JRE/JDK 17 or higher.
+- **Maven**: 3.8 or higher. For building the backend service.
+- **PHP**: 8.2 or higher (standard with VuFind 7+).
+- **VuFind**: Version 7.x or higher.
+
+---
+
+## 1. Export Service Setup (Backend)
+
+The backend service is a Java application that performs Solr queries and generates CSV files.
+
+### Installation
+1. **Clone this repository.**
+2. **Prepare the configuration files**:
+   - Copy `src/main/resources/application.properties.model` to `application.properties` and edit the values.
+   - Edit `bulk-downloader.conf` as needed (e.g., memory settings).
+3. **Build the project using Maven**:
+   ```bash
+   ./build.sh
+   ```
+   This generates `bulk-downloader.jar` in the root directory.
+
+### Running the Service
+**Manual execution**:
+```bash
+java -jar bulk-downloader.jar
+```
+
+**System service (Linux)**:
+```bash
+sudo ln -s $(pwd)/bulk-downloader.jar /etc/init.d/bulk-downloader
+sudo /etc/init.d/bulk-downloader start
+```
+The service will be available at `http://host:port/`.
+
+---
+
+## 2. VuFind Integration
+
+Follow these steps within your `<VUFIND_HOME>` directory to integrate the export functionality.
+
+### Step 1: Configuration
+1. **Copy the configuration file**: Copy `vufind/bulkexport.ini` to `<VUFIND_HOME>/local/config/vufind/`.
+2. **Adjust settings**: Edit `bulkexport.ini` to update the `serviceUrl`, `auxServUrl`, and your **Google ReCaptcha** keys in the `[Captcha]` section.
+
+### Step 2: Theme Customization
+1. **Copy templates**: Copy the `vufind/themes/custom_theme/templates/bulkexport` folder to your custom theme's `templates/` directory.
+2. **Update search results**:
+   - If `search/results.phtml` doesn't exist in your theme, copy it from the base theme.
+   - Insert the "Export CSV" link code snippet (found in this repository's `vufind/themes/custom_theme/templates/search/results.phtml`) into your template.
+
+### Step 3: Custom Module Logic
+1. **Controller**: Copy `vufind/module/CustomModule/src/CustomModule/Controller/BulkExportController.php` to `module/<YOUR_MODULE>/src/<YOUR_MODULE>/Controller/`.
+2. **Support Classes**: Copy `vufind/module/CustomModule/src/CustomModule/BulkExportConfirm.php` and `vufind/module/CustomModule/src/CustomModule/ExecuteBulkExportBackground.php` to `module/<YOUR_MODULE>/src/<YOUR_MODULE>/`.
+3. **Refactoring**: 
+   > [!IMPORTANT]
+   > In all copied `.php` files, update the `namespace` and class paths to match your custom module name.
+4. **Routes**: Merge the configurations from `vufind/module/CustomModule/config/module.config.php` into your custom module's `module.config.php`.
+
+### Step 4: Language Files
+Copy the translation strings from this repository's `vufind/languages/` folder (e.g., `en.ini`, `es.ini`, `pt-br.ini`) into the corresponding files in `<VUFIND_HOME>/languages/`.
+
+---
+
+## 3. Troubleshooting
+If the new routes or translations are not recognized, clear the VuFind cache:
+```bash
+rm -rf <VUFIND_HOME>/local/cache/configs/*
+rm -rf <VUFIND_HOME>/local/cache/languages/*
+```
+
+> [!TIP]
+> If downloads fail for very large result sets, increase the `timeout` setting in `bulkexport.ini`.
+
+---
 
 *Developed by LA Referencia / IBICT*
-
-## Running the export service
-
-### Install
-
-1. Clone/download this repository
-
-2. Edit config files
-
-> - src/main/resources/application.properties (first make a copy from src/main/resources/application.properties.model)
-
-> - bullk-downloader.conf
-
-3. Build using Maven/Java
-
-```
-$ ./build.sh
-```
-
-### Run
-
-- Run from bash
-
-```
-$ java -jar bulk-downloader.jar
-```
-
-- Run as service
-
-```
-$ sudo ln -s /path/to/vufind-bulk-downloader/bulk-downloader.jar /etc/init.d/bulk-downloader
-$ sudo /etc/init.d/bulk-downloader start
-``` 
-
-- Navigate to http://host:port/ 
-
-## Implementing the customizations in VuFind
-
-In the `vufind` folder:
-
-1. Configuration file `bulkexport.ini`
-- Copy the export configuration file to `<VUFIND_HOME>\config\vufind`
-- Adjust the entries as needed, especially sections `Service` and `Captcha`
-- ReCaptcha keys are obtained at http://www.google.com/recaptcha/admin upon domain registration
-
-2. Theme folder `custom_theme`
-
-- In case there is no custom theme:
-	- Create a new theme: [command line to create a new theme](https://vufind.org/wiki/development:code_generators#creating_themes)
-	- In the `config.ini` file (at `<VUFIND_HOME>\config\vufind`), change the `theme` entry to match the new theme name (the theme folder name)
-  - Copy the whole `bulkexport` folder to the `templates` folder
-  - Copy the `search/results.phtml` of base theme to the `templates` of `custom_theme` folder and copy the content of `search/results.phtml`, which include the "Export CSV" link, can be inserted in the existing customized template as desired.
-
-- If there are already custom templates:
-  - Copy the whole `bulkexport` folder to the `templates` folder
-  - If the `results.phtml` template is already customized, copy the content of `search/results.phtml`, which include the "Export CSV" link, can be inserted in the existing customized template as desired.
-  - If `search/results.phtml` still does not exist, copy the `search/results.phtml` of base theme to the `templates` of `custom_theme` folder and copy the content of `search/results.phtml`, which include the "Export CSV" link, can be inserted in the existing customized template as desired.
-		
-3. Module folder `CustomModule`
-
-- VuFind must already have a custom module configured, which is created when it is installed
-
-- If the `module.config.php` file in `<VUFIND_HOME>\module\<CUSTOM_MODULE>\config` has no configuration (the `$config` array variable is empty), it can be replaced by the `module.config.php` file in `CustomModule\config`. If there are already custom configurations, the entries in the `CustomModule\config\module.config.php` (which configure the new controller and routes) must be inserted in the existing module config file. Check the VuFind module configuration file at `<VUFIND_HOME>\module\VuFind\config` to see where controller and static routes entries must be added. In any case, be sure to replace `custom` in the file paths with your own custom module name
-
-- Copy the `Controller` folder in `CustomModule\src\CustomModule` to `<VUFIND_HOME>\module\<CUSTOM_MODULE>\src\<CUSTOM_MODULE>` if it still does not exist, or copy only the `BulkExportController.php` class (under `Controller`) to the existing local `Controller` folder otherwise
-	- Edit the `BulkExportController.php` class to replace `custom` with your own custom module name in the namespace and the path to the `BulkExportConfirm` class (lines 3 and 6)
-	
-- Copy the `BulkExportConfirm.php` class to `<VUFIND_HOME>\module\<CUSTOM_MODULE>\src\<CUSTOM_MODULE>`, and edit the file to replace `CustomModule` with your own custom module name in the namespace (line 3)
-
-- Copy the `ExecuteBulkExportBackground.php` class to `<VUFIND_HOME>\module\<CUSTOM_MODULE>\src\<CUSTOM_MODULE>`. This is the class which will be called in background to perform the export, so be sure to inform its full path in the `bulkexport.ini` file (see above), in the `backgroundClass` entry
-
-
-4. Language files in the `languages` folder
-
-The new translation entries for the bulk download feature have been added to the language files for English, Spanish, and Brazilian Portuguese.
-Copy the new translation entries for the bulk download feature from the provided files and paste them into the corresponding existing language files in your `<VUFIND_HOME>\languages` directory.
-
-
-VuFind should now include the new template and custom module files. If the new routes are not being found, delete the config cache at `<VUFIND_HOME>\local\cache\configs` so the new configuration, including the new routes, are correctly loaded. It may also be necessary to delete the language cache, at `<VUFIND_HOME>\local\cache\languages`.
