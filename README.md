@@ -12,7 +12,7 @@ A comprehensive solution for exporting VuFind search results into CSV or RIS for
 
 ---
 
-## 1. Export Service Setup (Backend)
+## 1. Bulk Downloader Setup (Java/Spring Boot)
 
 The backend service is a Java application that performs Solr queries and generates CSV files.
 
@@ -42,7 +42,7 @@ The service will be available at `http://host:port/`.
 
 ---
 
-## 2. VuFind Integration
+## 2. VuFind Integration (PHP)
 
 Follow these steps within your `<VUFIND_HOME>` directory to integrate the export functionality.
 
