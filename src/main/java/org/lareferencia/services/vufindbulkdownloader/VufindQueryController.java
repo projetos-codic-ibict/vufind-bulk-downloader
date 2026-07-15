@@ -152,12 +152,14 @@ public class VufindQueryController {
             String queryString,
             String outputFile,
             String encoding,
-            boolean risOrNot) {
+            boolean risOrNot,
+            int numRecords) {
         StringBuffer content = new StringBuffer();
 
         try {
             // URL url = URI.create(buildQueryUrl(queryString)).toURL();
-            URL url = new URL(buildQueryUrl(queryString));
+            String limitedQueryString = queryString.replaceAll("rows=\\d+", "rows=" + numRecords);
+            URL url = new URL(buildQueryUrl(limitedQueryString));
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -237,7 +239,7 @@ public class VufindQueryController {
             this.log.info("init executeQuery...");
             boolean isDownload = Boolean.parseBoolean(download);
             // boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
-            // int numRecords = Integer.valueOf(totalRecords);∆
+            int numRecords = Integer.valueOf(totalRecords);
 
             String fileName = generetaFileName(queryString, type);
             String outputFile = filePath + fileName;
@@ -246,9 +248,9 @@ public class VufindQueryController {
             if (isDownload || Files.exists(Paths.get(outputFile + ".zip"))) {
                 if (Files.notExists(Paths.get(outputFile + ".zip"))) {
                     if (type.equals("ris")) {
-                        createFile(queryString, outputFile, encoding, true);
+                        createFile(queryString, outputFile, encoding, true, numRecords);
                     } else {
-                        createFile(queryString, outputFile, encoding, false);
+                        createFile(queryString, outputFile, encoding, false, numRecords);
                     }
                 }
                 this.log.info("downloadUrl created for direct download: " + downloadUrl);
@@ -257,9 +259,9 @@ public class VufindQueryController {
                 this.log.info("downloadUrl will be sent to user by email later");
 
                 if (type.equals("ris")) {
-                    createFile(queryString, outputFile, encoding, true);
+                   createFile(queryString, outputFile, encoding, true, numRecords);
                 } else {
-                    createFile(queryString, outputFile, encoding, false);
+                    createFile(queryString, outputFile, encoding, false, numRecords);
                 }
 
                 String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
