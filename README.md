@@ -16,14 +16,75 @@ A comprehensive solution for exporting VuFind search results into CSV or RIS for
 - **VuFind**: Version 7.x or higher.
 
 
-## 1. Bulk Downloader Setup (Java/Spring Boot)
+## 1. Running
+
+### Docker Helper Script (`vufind-bulk-downloader.sh`)
+
+Use the helper script as the recommended way to run this project with Docker.
+
+> [!NOTE]
+> This Bulk Downloader service does **not** require an internal database. It is stateless and reads/writes files plus external services (Solr/SMTP).
+
+> [!TIP]
+> In `application.properties`, set `file.path=/app/data/` so exported files are persisted in the mounted `./data` folder.
+
+> [!NOTE]
+> If `server.host` is used to generate download links for external users, set it to your public URL/domain.
+
+Use the helper script to manage build/run/update tasks:
+
+```bash
+./vufind-bulk-downloader.sh help
+```
+
+Available commands:
+
+- `generate-config`: Generate `src/main/resources/application.properties` from `.env`
+- `install`: Generate config, build image, and start service
+- `update`: Generate config, rebuild with `--no-cache`, and recreate service
+- `rebuild`: Rebuild image with current code and recreate service
+- `restart`: Restart container
+- `start`: Start container
+- `stop`: Stop container without removing data
+- `logs [args...]`: Show container logs (or pass additional `docker compose logs` args)
+- `health`: Generate config and check Bulk Downloader and Solr endpoints (Solr URL from `application.properties` key `solr.server.url`)
+- `shell`: Open shell in the running container
+- `help`: Show command help
+
+Quick start:
+
+```bash
+git clone <repository-url>
+cd vufind-bulk-downloader
+
+cp .env.example .env
+# Edit .env values (Docker vars and APP_* application settings)
+
+./vufind-bulk-downloader.sh generate-config
+./vufind-bulk-downloader.sh install
+./vufind-bulk-downloader.sh health
+```
+
+Manual Java run from `.env`:
+
+```bash
+cp .env.example .env
+# Edit .env values as needed
+
+./vufind-bulk-downloader.sh generate-config
+./build.sh
+java -jar bulk-downloader.jar
+```
+
+1. Bulk Downloader Setup (Java/Spring Boot)
 
 The backend service is a Java application that performs Solr queries and generates CSV files.
 
-### Installation
+### Manual Installation
 1. **Clone this repository.**
 2. **Prepare the configuration files**:
-   - Copy `src/main/resources/application.properties.model` to `application.properties` and edit the values.
+   - Copy `.env.example` to `.env` and edit values.
+   - Run `./vufind-bulk-downloader.sh generate-config` to create `src/main/resources/application.properties`.
    - Edit `bulk-downloader.conf` as needed (e.g., memory settings).
 3. **Build the project using Maven**:
    ```bash
@@ -31,8 +92,7 @@ The backend service is a Java application that performs Solr queries and generat
    ```
    This generates `bulk-downloader.jar` in the root directory.
 
-### Running the Service
-**Manual execution**:
+**Manual Java execution**:
 ```bash
 java -jar bulk-downloader.jar
 ```

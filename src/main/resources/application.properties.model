@@ -1,12 +1,12 @@
 ##Solr query properties##
 
 #Server address
-query.solr-server = <host>/solr/biblio
+solr.server.url = http://localhost:8983/solr/biblio
 
 ##CSV file properties##
 
 #Directory where files will be saved to
-file.path = /tmp/vufind-bulk-downloader/
+file.path=/app/data/
 #Separator character
 file.sep-char = ,
 #Symbol used to separate values in multiple-value fields

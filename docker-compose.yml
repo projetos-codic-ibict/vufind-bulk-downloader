@@ -1,0 +1,18 @@
+services:
+  bulk-downloader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-vufind-bulk-downloader}-app
+    environment:
+      JAVA_OPTS: ${JAVA_OPTS:-"-Xms256m -Xmx2g"}
+    ports:
+      - "${BULK_DOWNLOADER_PORT:-8081}:8081"
+    volumes:
+      - ./src/main/resources/application.properties:/app/config/application.properties:ro
+      - ./data:/app/data
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME:-vufind-bulk-downloader}-network

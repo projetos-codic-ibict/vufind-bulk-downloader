@@ -39,7 +39,7 @@ public class VufindQueryController {
 
     Log log = LogFactory.getLog(VufindQueryController.class);
 
-    @Value("${query.solr-server}")
+    @Value("${solr.server.url}")
     private String solrServer;
 
     @Value("${file.path}")
@@ -237,7 +237,7 @@ public class VufindQueryController {
             this.log.info("init executeQuery...");
             boolean isDownload = Boolean.parseBoolean(download);
             // boolean includeAbstract = Boolean.parseBoolean(hasAbstract);
-            // int numRecords = Integer.valueOf(totalRecords);
+            // int numRecords = Integer.valueOf(totalRecords);∆
 
             String fileName = generetaFileName(queryString, type);
             String outputFile = filePath + fileName;
@@ -251,23 +251,10 @@ public class VufindQueryController {
                         createFile(queryString, outputFile, encoding, false);
                     }
                 }
-
-                try {
-                    emailService.sendHtmlEmail(
-                            userEmail,
-                            confSubject,
-                            readyMsg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.log.info(
-                        "downloadUrl created for direct download: " + downloadUrl);
+                this.log.info("downloadUrl created for direct download: " + downloadUrl);
                 return downloadUrl;
             } else {
-                this.log.info(
-                        "downloadUrl will be sent to user by email later");
-                String waitMsg = waitMsgTop;
-                emailService.sendHtmlEmail(userEmail, confSubject, waitMsg);
+                this.log.info("downloadUrl will be sent to user by email later");
 
                 if (type.equals("ris")) {
                     createFile(queryString, outputFile, encoding, true);
@@ -276,8 +263,7 @@ public class VufindQueryController {
                 }
 
                 String linkMsg = linkMsgTop + " " + downloadUrl + linkMsgBottom;
-                this.log.info(
-                        "Sending an email containing a link to download the file.");
+                this.log.info("Sending an email containing a link to download the file.");
                 emailService.sendHtmlEmail(userEmail, linkSubject, linkMsg);
 
                 return null;
