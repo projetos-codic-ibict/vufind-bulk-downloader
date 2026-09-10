@@ -6,7 +6,7 @@ WORKDIR /workspace
 COPY . .
 
 # The application requires src/main/resources/application.properties at runtime.
-RUN test -f src/main/resources/application.properties || (echo "Missing src/main/resources/application.properties. Generate it from .env using ./vufind-bulk-downloader.sh generate-config" && exit 1)
+RUN test -f src/main/resources/application.properties || (echo "Missing src/main/resources/application.properties. Copy application.properties.model and configure it manually." && exit 1)
 RUN MAVEN_CONFIG= ./mvnw -DskipTests clean package
 
 FROM eclipse-temurin:17-jre

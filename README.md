@@ -18,7 +18,7 @@ A comprehensive solution for exporting VuFind search results into CSV or RIS for
 
 ## 1. Running
 
-### Docker Helper Script (`vufind-bulk-downloader.sh`)
+### Docker Helper Script (`deploy.sh`)
 
 Use the helper script as the recommended way to run this project with Docker.
 
@@ -34,20 +34,19 @@ Use the helper script as the recommended way to run this project with Docker.
 Use the helper script to manage build/run/update tasks:
 
 ```bash
-./vufind-bulk-downloader.sh help
+./deploy.sh help
 ```
 
 Available commands:
 
-- `generate-config`: Generate `src/main/resources/application.properties` from `.env`
-- `install`: Generate config, build image, and start service
-- `update`: Generate config, rebuild with `--no-cache`, and recreate service
+- `install`: Build image and start service
+- `update`: Rebuild with `--no-cache` and recreate service
 - `rebuild`: Rebuild image with current code and recreate service
 - `restart`: Restart container
 - `start`: Start container
 - `stop`: Stop container without removing data
 - `logs [args...]`: Show container logs (or pass additional `docker compose logs` args)
-- `health`: Generate config and check Bulk Downloader and Solr endpoints (Solr URL from `application.properties` key `solr.server.url`)
+- `health`: Check Bulk Downloader and Solr endpoints (Solr URL from `application.properties` key `solr.server.url`)
 - `shell`: Open shell in the running container
 - `help`: Show command help
 
@@ -57,21 +56,19 @@ Quick start:
 git clone <repository-url>
 cd vufind-bulk-downloader
 
-cp .env.example .env
-# Edit .env values (Docker vars and APP_* application settings)
+cp src/main/resources/application.properties.model src/main/resources/application.properties
+# Edit application.properties values
 
-./vufind-bulk-downloader.sh generate-config
-./vufind-bulk-downloader.sh install
-./vufind-bulk-downloader.sh health
+./deploy.sh install
+./deploy.sh health
 ```
 
-Manual Java run from `.env`:
+Manual Java run:
 
 ```bash
-cp .env.example .env
-# Edit .env values as needed
+cp src/main/resources/application.properties.model src/main/resources/application.properties
+# Edit application.properties values
 
-./vufind-bulk-downloader.sh generate-config
 ./build.sh
 java -jar bulk-downloader.jar
 ```
@@ -83,8 +80,7 @@ The backend service is a Java application that performs Solr queries and generat
 ### Manual Installation
 1. **Clone this repository.**
 2. **Prepare the configuration files**:
-   - Copy `.env.example` to `.env` and edit values.
-   - Run `./vufind-bulk-downloader.sh generate-config` to create `src/main/resources/application.properties`.
+   - Copy `src/main/resources/application.properties.model` to `src/main/resources/application.properties` and edit its values.
    - Edit `bulk-downloader.conf` as needed (e.g., memory settings).
 3. **Build the project using Maven**:
    ```bash
