@@ -115,11 +115,7 @@ public class VufindQueryController {
         this.log.info("buildDownloadUrl to fileName: " + fileName);
         try {
             String fileUrl = null;
-            if (this.host.contains("ibict.br")) {
-                fileUrl = host + "/query/download?fileName=" + fileName;
-            } else {
-                fileUrl = host + ":" + port + "/query/download?fileName=" + fileName;
-            }
+            fileUrl = host + "/query/download?fileName=" + fileName;
             this.log.info("fileURL created: " + fileUrl);
             return fileUrl;
         } catch (Exception e) {
