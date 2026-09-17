@@ -27,10 +27,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -227,7 +229,7 @@ public class VufindQueryController {
             @RequestParam(required = true) String totalRecords,
             @RequestParam(required = true) String hasAbstract,
             @RequestParam(required = true) String encoding,
-            @RequestParam(required = true) String userEmail,
+            @RequestParam(required = false) String userEmail,
             @RequestParam(required = true) String type) {
         try {
             this.log.info("init executeQuery...");
@@ -252,6 +254,11 @@ public class VufindQueryController {
             } else {
                 this.log.info("downloadUrl will be sent to user by email later");
 
+                if (userEmail == null || userEmail.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "userEmail is required when sending the download link by email");
+                }
+
                 if (type.equals("ris")) {
                     createFile(queryString, outputFile, encoding, true);
                 } else {
@@ -264,6 +271,8 @@ public class VufindQueryController {
 
                 return null;
             }
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
