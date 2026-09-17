@@ -40,7 +40,7 @@ Use the helper script to manage build/run/update tasks:
 Available commands:
 
 - `install`: Build image and start service
-- `update`: Rebuild with `--no-cache` and recreate service
+- `update`: Update the source with Git, rebuild with `--no-cache`, and recreate service
 - `rebuild`: Rebuild image with current code and recreate service
 - `restart`: Restart container
 - `start`: Start container

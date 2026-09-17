@@ -12,7 +12,7 @@ class BulkExportConfirm extends Form
 {
     protected $captcha;
 
-    public function __construct(CaptchaAdapter $captcha)
+    public function __construct(CaptchaAdapter $captcha, bool $emailRequired = true)
     {
         parent::__construct();
 
@@ -61,10 +61,9 @@ class BulkExportConfirm extends Form
             ],
         ]);
 
-        $this->add([
-            'type' => Element\Email::class,
-            'name' => 'email',
-        ]);
+        $email = new Element\Email('email');
+        $email->setAttribute('required', $emailRequired);
+        $this->add($email);
 
         $this->add([
             'type' => Element\Captcha::class,
@@ -97,6 +96,9 @@ class BulkExportConfirm extends Form
             'required' => false,
         ];
 
+        $emailInput = $email->getInputSpecification();
+        $emailInput['required'] = $emailRequired;
+
         $captchaInput = new Input('captcha');
         $sendInput = new Input('send');
 
@@ -104,6 +106,7 @@ class BulkExportConfirm extends Form
         $inputFilter->add($fieldsInput);
         $inputFilter->add($foreignAbstractInput);
         $inputFilter->add($osInput);
+        $inputFilter->add($emailInput);
         $inputFilter->add($captchaInput);
         $inputFilter->add($sendInput);
 

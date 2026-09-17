@@ -36,9 +36,11 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
         $defaultFields = $exportConfig->Query->defaultFields;
         $selectFields = $exportConfig->Query->selectFields;
         $showEncodingOption = $exportConfig->Encoding->showEncodingOption;
+        $emailRequired =
+            (int) $totalRecords > (int) $exportConfig->Query->maxDownload;
 
         // Display the export form
-        $form = new BulkExportConfirm($this->getCaptcha());
+        $form = new BulkExportConfirm($this->getCaptcha(), $emailRequired);
 
         return $this->createViewModel([
             'form' => $form,
@@ -49,6 +51,7 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
             'defFields' => $defaultFields,
             'selFields' => $selectFields,
             'encodingOption' => $showEncodingOption,
+            'emailRequired' => $emailRequired,
         ]);
     }
 
@@ -58,8 +61,13 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
         $serverUrlHelper = $this->getViewRenderer()->plugin('serverurl');
         $urlHelper = $this->getViewRenderer()->plugin('url');
 
+        $exportConfig = $this->getConf($this->bulkExportConf);
+        $totalRecords = (int) $this->params()->fromQuery('total');
+        $emailRequired =
+            $totalRecords > (int) $exportConfig->Query->maxDownload;
+
         // Retrieve form data
-        $form = new BulkExportConfirm($this->getCaptcha());
+        $form = new BulkExportConfirm($this->getCaptcha(), $emailRequired);
         $data = $this->params()->fromPost();
         $form->setData($data);
 
@@ -68,7 +76,6 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
             $email = $form->get('email')->getValue();
 
             // Build the field list
-            $exportConfig = $this->getConf($this->bulkExportConf);
             $defaultFields = explode(',', $exportConfig->Query->defaultFields);
             $showOptionalFields = $exportConfig->Query->showOptionalFields;
             $fullFieldList = $defaultFields;
@@ -137,7 +144,6 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
             // Checks whether an export file generated from this query already exists
 
             $maxTotal = $exportConfig->Query->maxDownload;
-            $totalRecords = $this->params()->fromQuery('total');
             $type = $this->params()->fromQuery('type');
             $fileExists = $this->callExportService(
                 $auxServUrl,
@@ -149,7 +155,6 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
                 null,
             );
             $queryLimit = $exportConfig->Query->rows;
-            $totalRecords = intval($totalRecords);
             if ($fileExists === null) {
                 return $this->serviceOfflineResponse();
             }

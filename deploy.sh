@@ -12,7 +12,7 @@ Usage: ./deploy.sh <command> [options]
 
 Commands:
   install                    Build images and start services
-  update                     Rebuild without cache and recreate services
+  update                     Update source with Git, rebuild without cache, and recreate services
   rebuild                    Rebuild images with current code and recreate services
   restart                    Restart existing containers
   start                      Start existing containers
@@ -45,6 +45,29 @@ ensure_docker_installed() {
     echo "Error: docker compose plugin v2 is required." >&2
     exit 1
   fi
+}
+
+update_source_checkout() {
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Error: git is not available in PATH; cannot update the source checkout." >&2
+    exit 1
+  fi
+
+  if ! git -C "${SCRIPT_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: ${SCRIPT_DIR} is not a Git checkout; cannot update the source code." >&2
+    exit 1
+  fi
+
+  local changes
+  changes="$(git -C "${SCRIPT_DIR}" status --porcelain=v1)"
+  if [ -n "${changes}" ]; then
+    echo "Error: local changes found in ${SCRIPT_DIR}; commit, stash, or remove them before update." >&2
+    printf "%s\n" "${changes}" >&2
+    exit 1
+  fi
+
+  echo "Updating source code..."
+  git -C "${SCRIPT_DIR}" pull --ff-only
 }
 
 get_app_property() {
@@ -161,6 +184,7 @@ case "${cmd}" in
   update)
     ensure_application_properties
     ensure_docker_installed
+    update_source_checkout
     build_images true
     recreate_environment
     ;;

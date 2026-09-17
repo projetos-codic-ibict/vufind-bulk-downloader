@@ -84,6 +84,7 @@ echo $this->formElementErrors($os);
 ?></div>
 <?php endif; ?>
 
+<?php if ($this->emailRequired): ?>
 <div style="margin-bottom:20px" class="form_element">
 <?php
 $email = $form->get('email');
@@ -91,6 +92,7 @@ echo $this->transEsc('E-mail address');
 echo $this->formEmail($email);
 echo $this->formElementErrors($email);
 ?></div>
+<?php endif; ?>
 
 <div style="margin-bottom:20px" class="form_element">
 <?php
