@@ -18,6 +18,7 @@ Commands:
   start                      Start existing containers
   stop                       Stop containers without removing volumes or data
   logs [args...]             Show logs
+  cleanup                    Delete all exported files in data/
   health                     Check Bulk Downloader and Solr endpoints
   shell                      Open a shell in the Bulk Downloader container
   help                       Show this help
@@ -154,12 +155,49 @@ build_images() {
   dc "${args[@]}" bulk-downloader
 }
 
+prepare_data_directory() {
+  local data_dir
+  local container_owner
+
+  data_dir="${SCRIPT_DIR}/data"
+  mkdir -p "${data_dir}"
+
+  container_owner="$(dc run --rm --no-deps --entrypoint sh bulk-downloader -c 'printf "%s:%s" "$(id -u)" "$(id -g)"')"
+  if [[ ! "${container_owner}" =~ ^[0-9]+:[0-9]+$ ]]; then
+    echo "Error: could not determine the UID:GID of the bulk-downloader container user." >&2
+    exit 1
+  fi
+
+  echo "Granting ${container_owner} write access to ${data_dir}..."
+  if [ "$(id -u)" -eq 0 ]; then
+    chown -R "${container_owner}" "${data_dir}"
+    chmod -R u+rwX "${data_dir}"
+  else
+    sudo chown -R "${container_owner}" "${data_dir}"
+    sudo chmod -R u+rwX "${data_dir}"
+  fi
+}
+cleanup_exports() {
+  local data_dir
+
+  data_dir="${SCRIPT_DIR}/data"
+  if [ ! -d "${data_dir}" ]; then
+    echo "No export directory found at ${data_dir}; nothing to clean."
+    return
+  fi
+
+  echo "Deleting all exported files from ${data_dir}..."
+  find "${data_dir}" -type f -print -delete
+}
+
 start_environment() {
+  prepare_data_directory
   dc up -d bulk-downloader
   echo "Bulk downloader: http://localhost:${SERVER_PORT}"
 }
 
 recreate_environment() {
+  prepare_data_directory
   dc up -d --force-recreate bulk-downloader
   echo "Bulk downloader: http://localhost:${SERVER_PORT}"
 }
@@ -199,12 +237,14 @@ case "${cmd}" in
   restart)
     ensure_application_properties
     ensure_docker_installed
+    prepare_data_directory
     dc restart bulk-downloader
     ;;
 
   start)
     ensure_application_properties
     ensure_docker_installed
+    prepare_data_directory
     dc start bulk-downloader
     ;;
 
@@ -212,6 +252,10 @@ case "${cmd}" in
     ensure_application_properties
     ensure_docker_installed
     dc stop bulk-downloader
+    ;;
+
+  cleanup)
+    cleanup_exports
     ;;
 
   logs)
