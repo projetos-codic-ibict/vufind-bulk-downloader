@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        MAVEN_MIRROR_URL: "${MAVEN_MIRROR_URL:-}"
     container_name: ${COMPOSE_PROJECT_NAME:-vufind-bulk-downloader}-app
     environment:
       JAVA_OPTS: "${JAVA_OPTS:--Xms256m -Xmx2g}"

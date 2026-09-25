@@ -15,6 +15,16 @@ A comprehensive solution for exporting VuFind search results into CSV or RIS for
 - **PHP**: 8.2 or higher (standard with VuFind 7+).
 - **VuFind**: Version 7.x or higher.
 
+### Maven mirror for Docker builds
+
+The Docker build uses Maven's default repository configuration unless `MAVEN_MIRROR_URL` is set in a `.env` file in the project root. To use Google's Maven Central mirror, for example:
+
+```env
+MAVEN_MIRROR_URL=https://maven-central.storage-download.googleapis.com/maven2/
+```
+
+When set, the mirror replaces Maven Central only (`mirrorOf=central`). Leave the value empty or unset to keep the default Maven behavior.
+
 
 ## 1. Running
 

@@ -3,11 +3,33 @@
 FROM maven:3.9.11-eclipse-temurin-17 AS build
 WORKDIR /workspace
 
+# Optional Maven Central mirror. Leave this build argument empty to use Maven's
+# default repository configuration.
+ARG MAVEN_MIRROR_URL=""
+
 COPY . .
 
 # The application requires src/main/resources/application.properties at runtime.
 RUN test -f src/main/resources/application.properties || (echo "Missing src/main/resources/application.properties. Copy application.properties.model and configure it manually." && exit 1)
-RUN MAVEN_CONFIG= ./mvnw -DskipTests clean package
+RUN if [ -n "${MAVEN_MIRROR_URL}" ]; then \
+      case "${MAVEN_MIRROR_URL}" in http://*|https://*) ;; *) echo "MAVEN_MIRROR_URL must be an HTTP(S) URL." >&2; exit 1;; esac; \
+      mkdir -p /tmp/maven && \
+      escaped_mirror_url="$(printf '%s' "${MAVEN_MIRROR_URL}" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')" && \
+      printf '%s\n' \
+        '<settings>' \
+        '  <mirrors>' \
+        '    <mirror>' \
+        '      <id>configured-maven-central-mirror</id>' \
+        '      <name>Configured Maven Central mirror</name>' \
+        "      <url>${escaped_mirror_url}</url>" \
+        '      <mirrorOf>central</mirrorOf>' \
+        '    </mirror>' \
+        '  </mirrors>' \
+        '</settings>' > /tmp/maven/settings.xml; \
+      ./mvnw --settings /tmp/maven/settings.xml -DskipTests clean package; \
+    else \
+      ./mvnw -DskipTests clean package; \
+    fi
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
