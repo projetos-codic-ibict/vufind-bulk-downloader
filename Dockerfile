@@ -13,8 +13,11 @@ COPY . .
 RUN test -f src/main/resources/application.properties || (echo "Missing src/main/resources/application.properties. Copy application.properties.model and configure it manually." && exit 1)
 RUN if [ -n "${MAVEN_MIRROR_URL}" ]; then \
       case "${MAVEN_MIRROR_URL}" in http://*|https://*) ;; *) echo "MAVEN_MIRROR_URL must be an HTTP(S) URL." >&2; exit 1;; esac; \
+      mirror_url="${MAVEN_MIRROR_URL%/}" && \
+      case "${mirror_url}" in *'|'*|*'&'*|*"'"*) echo "MAVEN_MIRROR_URL contains unsupported characters." >&2; exit 1;; esac; \
       mkdir -p /tmp/maven && \
-      escaped_mirror_url="$(printf '%s' "${MAVEN_MIRROR_URL}" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')" && \
+      escaped_mirror_url="$(printf '%s' "${mirror_url}" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')" && \
+      sed -i "s|https://repo.maven.apache.org/maven2|${mirror_url}|g" .mvn/wrapper/maven-wrapper.properties && \
       printf '%s\n' \
         '<settings>' \
         '  <mirrors>' \
@@ -26,9 +29,9 @@ RUN if [ -n "${MAVEN_MIRROR_URL}" ]; then \
         '    </mirror>' \
         '  </mirrors>' \
         '</settings>' > /tmp/maven/settings.xml; \
-      ./mvnw --settings /tmp/maven/settings.xml -DskipTests clean package; \
+      MAVEN_CONFIG= MVNW_REPOURL="${mirror_url}" ./mvnw --settings /tmp/maven/settings.xml -DskipTests clean package; \
     else \
-      ./mvnw -DskipTests clean package; \
+      MAVEN_CONFIG= ./mvnw -DskipTests clean package; \
     fi
 
 FROM eclipse-temurin:17-jre
