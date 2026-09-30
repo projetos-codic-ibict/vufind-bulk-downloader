@@ -23,11 +23,14 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
     protected $searchConf = 'searches';
     protected $bulkExportConf = 'bulkexport';
 
+    // Export types supported by the export service
+    protected $allowedTypes = ['csv', 'ris'];
+
     public function homeAction()
     {
         // Get the number of records returned in the search
-        $totalRecords = $this->params()->fromQuery('total');
-        $type = $this->params()->fromQuery('type');
+        $totalRecords = (int) $this->params()->fromQuery('total');
+        $type = $this->getExportType();
 
         // Get the query options
         $exportConfig = $this->getConf($this->bulkExportConf);
@@ -144,7 +147,7 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
             // Checks whether an export file generated from this query already exists
 
             $maxTotal = $exportConfig->Query->maxDownload;
-            $type = $this->params()->fromQuery('type');
+            $type = $this->getExportType();
             $fileExists = $this->callExportService(
                 $auxServUrl,
                 $paramString,
@@ -267,6 +270,14 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
         } catch (Exception $ex) {
             sprintf('Unexpected exception.');
         }
+    }
+
+    protected function getExportType()
+    {
+        // Only accept known export types, falling back to CSV
+        $type = $this->params()->fromQuery('type');
+
+        return in_array($type, $this->allowedTypes, true) ? $type : 'csv';
     }
 
     protected function getCaptcha()
