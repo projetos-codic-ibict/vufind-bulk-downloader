@@ -201,27 +201,30 @@ class BulkExportController extends \VuFind\Controller\AbstractBase
                 // File download link sent later by email
                 $backgroundCall = $exportConfig->Service->backgroundClass;
 
-                // Call the export service in background
-                $params =
-                    '"' .
-                    $email .
-                    '|' .
-                    $serviceUrl .
-                    '|' .
-                    $paramString .
-                    '|' .
-                    $totalRecords .
-                    '|' .
-                    $hasAbstract .
-                    '|' .
-                    $encoding .
-                    '|' .
-                    $type .
-                    '"';
-                $cmd = 'php ' . $backgroundCall . ' ' . $params;
+                // Call the export service in background. The params are
+                // written to a temporary file so that no user data is
+                // placed on the shell command line
+                $paramsFile = tempnam(sys_get_temp_dir(), 'bulkexport');
+                file_put_contents(
+                    $paramsFile,
+                    json_encode([
+                        'email' => $email,
+                        'serviceUrl' => $serviceUrl,
+                        'paramString' => $paramString,
+                        'totalRecords' => $totalRecords,
+                        'hasAbstract' => $hasAbstract,
+                        'encoding' => $encoding,
+                        'type' => $type,
+                    ]),
+                );
+                $cmd =
+                    'php ' .
+                    escapeshellarg($backgroundCall) .
+                    ' ' .
+                    escapeshellarg($paramsFile);
 
                 if (substr(php_uname(), 0, 7) == 'Windows') {
-                    pclose(popen('start /B ' . $cmd, 'r'));
+                    pclose(popen('start "" /B ' . $cmd, 'r'));
                 } else {
                     exec($cmd . ' > /dev/null &');
                 }

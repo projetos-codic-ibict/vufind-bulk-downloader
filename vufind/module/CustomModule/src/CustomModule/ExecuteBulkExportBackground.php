@@ -10,20 +10,27 @@ class ExecuteBulkExportBackground
     protected $encoding;
     protected $type;
 
-    public function __construct($params)
+    public function __construct($paramsFile)
     {
-        $paramsArray = explode('|', $params);
+        // Params are passed through a temporary JSON file written by
+        // BulkExportController, which is removed right after reading
+        $paramsArray = json_decode(file_get_contents($paramsFile), true);
+        unlink($paramsFile);
 
-        $this->email = $paramsArray[0];
-        $this->serviceUrl = $paramsArray[1];
-        $this->paramString = $paramsArray[2];
-        $this->totalRecords = intval($paramsArray[3]);
+        if (!is_array($paramsArray)) {
+            throw new Exception(sprintf('Invalid export params.'));
+        }
+
+        $this->email = $paramsArray['email'];
+        $this->serviceUrl = $paramsArray['serviceUrl'];
+        $this->paramString = $paramsArray['paramString'];
+        $this->totalRecords = intval($paramsArray['totalRecords']);
         $this->hasAbstract = filter_var(
-            $paramsArray[4],
+            $paramsArray['hasAbstract'],
             FILTER_VALIDATE_BOOLEAN,
         );
-        $this->encoding = $paramsArray[5];
-        $this->type = $paramsArray[6];
+        $this->encoding = $paramsArray['encoding'];
+        $this->type = $paramsArray['type'];
     }
 
     public function execute()
