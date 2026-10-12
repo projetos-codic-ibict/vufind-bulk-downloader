@@ -165,6 +165,7 @@ public class VufindQueryController {
         StringBuffer content = new StringBuffer();
 
         try {
+            this.log.info("queryString: "+ queryString);
             // URL url = URI.create(buildQueryUrl(queryString)).toURL();
             URL url = new URL(buildQueryUrl(queryString));
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
